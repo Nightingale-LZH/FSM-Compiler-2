@@ -1,4 +1,8 @@
-#define FSM_PROCESSED
+#ifndef ___FSM_KEYWORD_ARDUINO_HPP___
+#define ___FSM_KEYWORD_ARDUINO_HPP___
+
+#include "Arduino.h"
+
 #ifndef FSM_PROCESSED
 
 #define FSM void
@@ -7,14 +11,18 @@
 #define DO do
 #define IF if
 #define ELSE else
+
 #define GLOBAL 
+
 #define YIELD 
-
 void WAIT(int milliseconds) { sleep(milliseconds); }
-
 void WAIT_UNLESS(bool condition) {  }
 
-#endif
+#define BREAK break
+#define CONTINUE continue
+#define RETURN return
+
+#endif  //  FSM_PROCESSED
 
 // -------------------------------------------------- //
 //                WAIT Wtatment Related               //
@@ -39,3 +47,5 @@ void WAIT_UNLESS(bool condition) {  }
 #define __DECLARE_MIN_RUNTIME_ITER_TIME_VARIABLE(fsm_name) unsigned long __fsm_min_runtime_iter_time_ ## fsm_name = 0;
 #define __REGISTER_MIN_RUNTIME_ITER_CURRENT_TIME(fsm_name) __fsm_min_runtime_iter_time_ ## fsm_name = millis();
 #define ___MIN_RUNTIME_IS_TIME_PASSED(fsm_name, time_ms) (millis() > __fsm_min_runtime_iter_time_ ## fsm_name + (time_ms))
+
+#endif  //  ___FSM_KEYWORD_ARDUINO_HPP___

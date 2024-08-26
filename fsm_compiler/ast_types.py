@@ -324,6 +324,32 @@ class StatementWaitUnless(Statement):
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
+    
+@dataclass
+class StatementBreak(Statement): 
+    
+    def to_fsm(self, fsm_name:str|None=None) -> TO_FSM_Return:
+        pass
+    
+    def print_pretty(self, indentation:int=0) -> str:
+        pass
+    
+class StatementContinue(Statement): 
+    
+    def to_fsm(self, fsm_name:str|None=None) -> TO_FSM_Return:
+        pass
+    
+    def print_pretty(self, indentation:int=0) -> str:
+        pass
+    
+class StatementReturn(Statement): 
+    
+    def to_fsm(self, fsm_name:str|None=None) -> TO_FSM_Return:
+        pass
+    
+    def print_pretty(self, indentation:int=0) -> str:
+        pass
+    
 
 @dataclass
 class ParseResult(Statement):

@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 import unittest
 
 import fsm_compiler.parser as parser
+import fsm_compiler.ast_types as ast_types
 
 
 class TestParserBasic(unittest.TestCase):
@@ -299,6 +300,15 @@ class TestParserBasic(unittest.TestCase):
         
         self.assertEqual(res.function_name, "func_cpp_test_code")
         self.assertEqual(len(res.statements.lines), 11)
+        
+    def test_parser_break_continue_return(self):
+        s = "FSM function_name_cbr() { BREAK; CONTINUE; RETURN; }"
+        res = parser.parse_to_AST(s)
+        
+        self.assertEqual(res.function_name, "function_name_cbr")
+        self.assertIsInstance(res.statements.lines[0], ast_types.StatementBreak)
+        self.assertIsInstance(res.statements.lines[1], ast_types.StatementContinue)
+        self.assertIsInstance(res.statements.lines[2], ast_types.StatementReturn)
     
 
 class TestParserPrettyPrint(unittest.TestCase):

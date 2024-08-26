@@ -23,9 +23,15 @@ switchstmt  : "case" expression ":"     -> switchstmt
             | statement                 -> switchstmt
 
 partialstmt : declaration                               -> partialstmt_declaration
+
+            | "BREAK"                                   -> partialstmt_break
+            | "CONTINUE"                                -> partialstmt_continue
+            | "RETURN"                                  -> partialstmt_return
+
             | "YIELD"                                   -> partialstmt_yield
             | "WAIT" "(" expression ")"                 -> partialstmt_wait
             | "WAIT_UNLESS" "(" expression ")"          -> partialstmt_wait_until
+            
             | assignment                                -> partialstmt
             | expression                                -> partialstmt
 

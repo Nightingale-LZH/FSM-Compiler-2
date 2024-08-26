@@ -116,6 +116,15 @@ def parse_statement_partial(input_str:str, partial_ast:lark.Tree) -> Statement|N
     if partial_ast.data == "partialstmt_wait_until":
         condition = partial_ast.children[0]
         return StatementWaitUnless(partial_ast, input_str[condition.meta.start_pos : condition.meta.end_pos])
+    
+    if partial_ast.data == "partialstmt_break":
+        return StatementBreak(partial_ast)
+
+    if partial_ast.data == "partialstmt_continue":
+        return StatementContinue(partial_ast)
+
+    if partial_ast.data == "partialstmt_return":
+        return StatementReturn(partial_ast)
   
   
 def parse_statement_if_else(input_str:str, partial_ast:lark.Tree) -> Statement|None:
