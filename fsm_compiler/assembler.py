@@ -136,15 +136,16 @@ def generate_FSM_from_AST(parse_result: ParseResult, optimization_level:int=4) -
         2. optimize chained empty state, and all above
         3. optimize chained branching, and all above
         4. optimize chained merging, and all above
+        5. optimize consecutive uncollapsible states, and all above
 
     Parameters
     ----------
     parse_result : ParseResult
         Resulting AST from parser
     optimization_level : int, optional
-        optimization level of the FSM, by default 4  
+        optimization level of the FSM, by default 5  
         - 0 is no optimization, 
-        - 4 is all context-free optimization
+        - 5 is all context-free optimization
 
     Returns
     -------
@@ -531,20 +532,150 @@ def optimize_fsm_chained_merging(fsm_starting_node:FSMNode) -> bool:
     
     return has_modified_master
 
-OPTIMIZATION_STRATEGIES = [
-    optimize_fsm_consecutive_states,
-    optimize_fsm_chained_empty_state,
-    optimize_fsm_chained_branching,
-    optimize_fsm_chained_merging,
-]
+
+def is_truly_collapsible(fsm_node:FSMNode, fsm_starting_node:FSMNode) -> bool:
+    """determine if the node is truly collapsible, ignore the collapsible field
+
+    The node is collapsible if
+        - only one trace-back-transition
+        - the trace-back-transition does not have transition condition
+        - does not have entry condition
+        - the node has equal or greater than 1 transitions to other nodes (so, this is not end node)
+        - the node is not beginning node
+        
+    Parameters
+    ----------
+    fsm_node : FSMNode
+        Determined Node
+    fsm_starting_node : FSMNode
+        Starting Node
+
+    Returns
+    -------
+    bool
+        determine if the node is truly collapsible
+    """
+    traced_back_transitions = trace_back_transition(fsm_node, fsm_starting_node)
+    
+    return (
+        len(traced_back_transitions) == 1
+        and traced_back_transitions[0].condition == ""
+        and fsm_node.entry_condition == ""
+        and len(fsm_node.transitions) >= 1
+        and id(fsm_node) != id(fsm_starting_node)
+    )
+
+
+def optimize_fsm_consecutive_uncollapsible_states(fsm_starting_node:FSMNode) -> bool:
+    """optimize consecutive uncollapsible states
+    
+    This optimization strategy is primary aim for less optimized structure created by BREAK, CONTINUE, 
+    and RETURN. 
+    
+    collapse if 
+        - it only have one transition to next node, and
+        - the only transition doesn't have condition, and
+        - its next node is collapsible
+        
+    However, this function will trace back transitions from a node to determine if the node is collapsible, 
+    rather than following the labeled collapsible. This function might over optimize the FSM, so Use it with 
+    caution. 
+    
+    The node is collapsible if
+        - only one trace-back-transition
+        - does not have entry condition
+        - the node has more than 1 transitions to other nodes (so, this is not end node)
+    
+    this function will modifiy the given fsm. Does NOT return a new FSM
+    
+    Parameters
+    ----------
+    fsm_starting_node : FSMNode
+        Starting Node
+
+    Returns
+    -------
+    bool
+        If the fsm is modified at all
+    """
+    
+    # implement fix-point algorithm
+    
+    has_modified = True
+    while (has_modified):
+        has_modified = False
+        has_modified_master = False
+        
+        searched_nodes: set[FSMNode] = set()
+    
+        search_queue: list[FSMNode] = []
+        
+        search_queue.append(fsm_starting_node)
+        while len(search_queue) != 0:
+            node_curr = search_queue.pop(0) 
+            
+            searched_nodes.add(node_curr)
+            
+            # collapse if 
+            #   - it only have one transition to next node, and
+            #   - the only transition doesn't have condition, and
+            #   - it's next node is collapsible
+            
+            if len(node_curr.transitions) == 0:
+                continue
+            elif len(node_curr.transitions) == 1:
+                # if it's next node is collapsible and transition condition is "", then collapse
+                
+                transition: FSMTransition = node_curr.transitions[0]
+                node_next: FSMNode = transition.target_node
+                assert len(transition.code_block) == 0 # the generated fsm will never have mealy transition
+                
+                if transition.condition == "" and is_truly_collapsible(node_next, fsm_starting_node):
+                    # collapse curr and next nodes
+                    if len(node_curr.code_block) == 0:
+                        node_curr.code_block = node_next.code_block
+                    else:
+                        if len(node_next.code_block) > 0:
+                            node_curr.code_block += node_next.code_block
+                    
+                    node_curr.transitions = node_next.transitions
+                    
+                    has_modified = True
+                    has_modified_master = True
+                    break
+                
+                else: 
+                    if node_next not in searched_nodes:
+                        search_queue.append(node_next)
+            else:
+                for transition in node_curr.transitions:
+                    node_next: FSMNode = transition.target_node
+                    
+                    if node_next not in searched_nodes:
+                        search_queue.append(node_next)
+    
+    return has_modified_master
+
 
 # -------------------------------------------------- #
 #                 FSM Optimization                   #
 # -------------------------------------------------- #
 
-def optimize_fsm(fsm_starting_node:FSMNode, opt_level:int=4) -> None:
-    for level in range(opt_level):
-        while OPTIMIZATION_STRATEGIES[level](fsm_starting_node):
-            "Nothing to do here, optimize until nothing changed"
+OPTIMIZATION_STRATEGIES = [
+    optimize_fsm_consecutive_states,
+    optimize_fsm_chained_empty_state,
+    optimize_fsm_chained_branching,
+    optimize_fsm_chained_merging,
+    optimize_fsm_consecutive_uncollapsible_states,
+]
+
+def optimize_fsm(fsm_starting_node:FSMNode, opt_level:int=5) -> None:
+    opt_level = min(opt_level, len(OPTIMIZATION_STRATEGIES))
+    is_changed = True
+    while (is_changed):
+        is_changed = False
+        for level in range(opt_level):
+            while OPTIMIZATION_STRATEGIES[level](fsm_starting_node):
+                is_changed = True
 
 
