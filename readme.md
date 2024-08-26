@@ -13,10 +13,11 @@ Two versions of the lark parser:
 
 ## Limitation
 
+- The structural control statement `BREAK`, `CONTINUE`, `RETURN` cannot be in Initialization and Update part of the `FOR` loop
+
 The FSM compiler does not support:
 
 - multiple declarations `int a, b;`
-- structural controls like `break`, `continue`, `return`
 - generics
 - `GLOBAL` defined classes
 - `for` loop version of infinite loop (`for(;;) { loop; }`)
@@ -27,6 +28,15 @@ The FSM compiler does not support:
 - lambda functions (anonymous functions)
 
 ## FSM Function Syntax
+
+### Structural Control: `BREAK`, `CONTINUE`, and `RETURN`
+
+`BREAK`, `CONTINUE`, and `RETURN` are the same as `break`, `continue` and `return` from C/C++ languages. However, they will modify FSM loops (`FOR`, `WHILE`, and `DO-WHILE`).
+
+When using structural control statement: `BREAK`, `CONTINUE` at the top level of the function, i.e., not in any kind of FSM loops (`FOR`, `WHILE`, and `DO-WHILE`),
+
+- `BREAK` will move the instruction pointer to the end of the function. In this case, `BREAK` is equivalent to `RETURN`.
+- `CONTINUE` will move the instruction pointer to the beginning of the function. In other words, this will restart the function in this case.
 
 ## Module Structure
 
@@ -73,5 +83,6 @@ flowchart BT
 
 - [ ] Function call to other FSM
 - [ ] C++ templating
-- [ ] Structural controls like `break`, `continue`, `return`
+- [x] ~~Structural controls like `break`, `continue`, `return`~~
 - [ ] Error state, analogs to ending state
+
