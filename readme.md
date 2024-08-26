@@ -11,6 +11,14 @@ Two versions of the lark parser:
 - basic parser: support basic C/C++ functionalities
 - experimental parser: support some advanced C/C++ features
 
+## External Dependency
+
+The project is developed using Python 3.11.x.
+
+External libraries
+
+- [Lark Parser](https://github.com/lark-parser/lark)
+
 ## Limitation
 
 - The structural control statement `BREAK`, `CONTINUE`, `RETURN` cannot be in Initialization and Update part of the `FOR` loop
@@ -82,7 +90,7 @@ flowchart BT
 ## Roadmap
 
 - [ ] Function call to other FSM
-- [ ] C++ templating
+- [ ] C++ templating, i.e. generics
 - [x] ~~Structural controls like `break`, `continue`, `return`~~
 - [ ] Error state, analogs to ending state
 
