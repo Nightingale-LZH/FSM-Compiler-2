@@ -74,3 +74,4 @@ flowchart BT
 - [ ] Function call to other FSM
 - [ ] C++ templating
 - [ ] Structural controls like `break`, `continue`, `return`
+- [ ] Error state, analogs to ending state
