@@ -29,6 +29,15 @@ The FSM compiler does not support:
 
 ## FSM Function Syntax
 
+### Structural Control: `BREAK`, `CONTINUE`, and `RETURN`
+
+`BREAK`, `CONTINUE`, and `RETURN` are the same as `break`, `continue` and `return` from C/C++ languages. However, they will modify FSM loops (`FOR`, `WHILE`, and `DO-WHILE`).
+
+When using structural control statement: `BREAK`, `CONTINUE` at the top level of the function, i.e., not in any kind of FSM loops (`FOR`, `WHILE`, and `DO-WHILE`),
+
+- `BREAK` will move the instruction pointer to the end of the function. In this case, `BREAK` is equivalent to `RETURN`.
+- `CONTINUE` will move the instruction pointer to the beginning of the function. In other words, this will restart the function in this case.
+
 ## Module Structure
 
 - **`parser.py`**: Parse the C/C++ function into an Abstract Syntax Tree (AST). This is the combination of lexer and parser.
