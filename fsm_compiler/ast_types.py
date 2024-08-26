@@ -63,6 +63,10 @@ class TO_FSM_Return:
     starting_node: FSMNode
     ending_node: FSMNode
     global_variables: list[FSMGlobalVar]
+    
+    return_nodes: list[FSMNode]
+    break_nodes: list[FSMNode]
+    continue_nodes: list[FSMNode]
 
 # -------------------------------------------------- #
 #                        AST                         #
@@ -84,7 +88,7 @@ class StatementLine(Statement):
     
     def to_fsm(self, fsm_name:str|None=None) -> TO_FSM_Return:
         node = FSMNode(["{};".format(self.block)], [])
-        return TO_FSM_Return(node, node, [])
+        return TO_FSM_Return(node, node, [], [], [], [])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -95,7 +99,7 @@ class StatementOrdinary(Statement):
     
     def to_fsm(self, fsm_name:str|None=None) -> TO_FSM_Return:
         node = FSMNode([self.block], [])
-        return TO_FSM_Return(node, node, [])
+        return TO_FSM_Return(node, node, [], [], [], [])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -108,18 +112,30 @@ class StatementBlock(Statement):
         node_start = FSMNode([], [])
         ret_global_vars = []
         
+        ret_return_nodes = []
+        ret_break_nodes = []
+        ret_continue_nodes = []
+        
         node_end = node_start
         for line in self.lines:
             fsm_return_statement = line.to_fsm(fsm_name)
             
-            for gv in fsm_return_statement.global_variables:
-                ret_global_vars.append(gv)
+            # for gv in fsm_return_statement.global_variables:
+            #     ret_global_vars.append(gv)
+                
+            ret_global_vars    += fsm_return_statement.global_variables
+            ret_return_nodes   += fsm_return_statement.return_nodes
+            ret_break_nodes    += fsm_return_statement.break_nodes
+            ret_continue_nodes += fsm_return_statement.continue_nodes
                 
             node_end.transitions.append(FSMTransition([], "", fsm_return_statement.starting_node))
             
             node_end = fsm_return_statement.ending_node
             
-        return TO_FSM_Return(node_start, node_end, ret_global_vars)
+        return TO_FSM_Return(
+            node_start, node_end, ret_global_vars, 
+            ret_return_nodes, ret_break_nodes, ret_continue_nodes
+        )
             
     
     def print_pretty(self, indentation:int=0) -> str:
@@ -134,17 +150,37 @@ class StatementWhile(Statement):
         node_start = FSMNode([], [], False)
         node_end = FSMNode([], [])
         ret_global_vars = []
+        ret_return_nodes = []
         
         fsm_return_statement = self.statements.to_fsm(fsm_name)
-        for gv in fsm_return_statement.global_variables:
-                ret_global_vars.append(gv)
+        # for gv in fsm_return_statement.global_variables:
+        #         ret_global_vars.append(gv)
+        ret_global_vars    += fsm_return_statement.global_variables
+        ret_return_nodes   += fsm_return_statement.return_nodes
         
         node_start.transitions.append(FSMTransition([], self.condition, fsm_return_statement.starting_node))
         node_start.transitions.append(FSMTransition([], "", node_end))
         
+        # continue statement
+        if len(fsm_return_statement.continue_nodes) > 0:
+            # clear all extra transitions and point all the node to continue node
+            for continue_node in fsm_return_statement.continue_nodes:
+                continue_node.transitions.clear()
+                continue_node.transitions.append(FSMTransition([], "", node_start))
+        
+        # break statement
+        if len(fsm_return_statement.break_nodes) > 0:
+            # clear all extra transitions and point all the node to break node
+            for break_node in fsm_return_statement.break_nodes:
+                break_node.transitions.clear()
+                break_node.transitions.append(FSMTransition([], "", node_end))
+                
+            # multiple node will point to end node, then the end node will be uncollapsible
+            node_end.collapsible = False
+        
         fsm_return_statement.ending_node.transitions.append(FSMTransition([], "", node_start))
         
-        return TO_FSM_Return(node_start, node_end, ret_global_vars)
+        return TO_FSM_Return(node_start, node_end, ret_global_vars, ret_return_nodes, [], [])
         
     
     def print_pretty(self, indentation:int=0) -> str:
@@ -159,17 +195,37 @@ class StatementDoWhile(Statement):
         node_start = FSMNode([], [], False)
         node_end = FSMNode([], [])
         ret_global_vars = []
+        ret_return_nodes = []
         
         fsm_return_statement = self.statements.to_fsm(fsm_name)
-        for gv in fsm_return_statement.global_variables:
-                ret_global_vars.append(gv)
+        # for gv in fsm_return_statement.global_variables:
+        #         ret_global_vars.append(gv)
+        ret_global_vars    += fsm_return_statement.global_variables
+        ret_return_nodes   += fsm_return_statement.return_nodes
                 
         node_start.transitions.append(FSMTransition([], "", fsm_return_statement.starting_node))
         
         fsm_return_statement.ending_node.transitions.append(FSMTransition([], self.condition, node_start))
         fsm_return_statement.ending_node.transitions.append(FSMTransition([], "", node_end))
         
-        return TO_FSM_Return(node_start, node_end, ret_global_vars)
+        # continue statement
+        if len(fsm_return_statement.continue_nodes) > 0:
+            # clear all extra transitions and point all the node to continue node
+            for continue_node in fsm_return_statement.continue_nodes:
+                continue_node.transitions.clear()
+                continue_node.transitions.append(FSMTransition([], "", node_start))
+        
+        # break statement
+        if len(fsm_return_statement.break_nodes) > 0:
+            # clear all extra transitions and point all the node to break node
+            for break_node in fsm_return_statement.break_nodes:
+                break_node.transitions.clear()
+                break_node.transitions.append(FSMTransition([], "", node_end))
+                
+            # multiple node will point to end node, then the end node will be uncollapsible
+            node_end.collapsible = False
+            
+        return TO_FSM_Return(node_start, node_end, ret_global_vars, ret_return_nodes, [], [])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -187,18 +243,23 @@ class StatementFor(Statement):
         node_loop_start = FSMNode([], [], False)
         node_end = FSMNode([], [])
         ret_global_vars = []
+        ret_return_nodes = []
         
         fsm_return_initialization = self.initialization.to_fsm(fsm_name)
-        for gv in fsm_return_initialization.global_variables:
-                ret_global_vars.append(gv)
+        # for gv in fsm_return_initialization.global_variables:
+        #         ret_global_vars.append(gv)
+        ret_global_vars += fsm_return_initialization.global_variables
                 
         fsm_return_update = self.update.to_fsm(fsm_name)
-        for gv in fsm_return_update.global_variables:
-                ret_global_vars.append(gv)
+        # for gv in fsm_return_update.global_variables:
+        #         ret_global_vars.append(gv)
+        ret_global_vars += fsm_return_update.global_variables
         
         fsm_return_statement = self.statements.to_fsm(fsm_name)
-        for gv in fsm_return_statement.global_variables:
-                ret_global_vars.append(gv)
+        # for gv in fsm_return_statement.global_variables:
+        #         ret_global_vars.append(gv)
+        ret_global_vars += fsm_return_statement.global_variables
+        ret_return_nodes   += fsm_return_statement.return_nodes
                 
         node_start.transitions.append(FSMTransition([], "", fsm_return_initialization.starting_node))
         fsm_return_initialization.ending_node.transitions.append(FSMTransition([], "", node_loop_start))
@@ -209,7 +270,24 @@ class StatementFor(Statement):
         fsm_return_statement.ending_node.transitions.append(FSMTransition([], "", fsm_return_update.starting_node))
         fsm_return_update.ending_node.transitions.append(FSMTransition([], "", node_loop_start))
         
-        return TO_FSM_Return(node_start, node_end, ret_global_vars)
+        # continue statement
+        if len(fsm_return_statement.continue_nodes) > 0:
+            # clear all extra transitions and point all the node to continue node
+            for continue_node in fsm_return_statement.continue_nodes:
+                continue_node.transitions.clear()
+                continue_node.transitions.append(FSMTransition([], "", node_start))
+        
+        # break statement
+        if len(fsm_return_statement.break_nodes) > 0:
+            # clear all extra transitions and point all the node to break node
+            for break_node in fsm_return_statement.break_nodes:
+                break_node.transitions.clear()
+                break_node.transitions.append(FSMTransition([], "", node_end))
+                
+            # multiple node will point to end node, then the end node will be uncollapsible
+            node_end.collapsible = False
+        
+        return TO_FSM_Return(node_start, node_end, ret_global_vars, ret_return_nodes, [], [])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -229,6 +307,10 @@ class StatementIf(Statement):
         node_end = FSMNode([], [], False)
         ret_global_vars = []
         
+        ret_return_nodes = []
+        ret_break_nodes = []
+        ret_continue_nodes = []
+        
         is_else_case_avaliable = False
         
         for case in self.cases:
@@ -237,8 +319,13 @@ class StatementIf(Statement):
                 is_else_case_avaliable = True
             
             fsm_return_statement = case.statements.to_fsm(fsm_name)
-            for gv in fsm_return_statement.global_variables:
-                    ret_global_vars.append(gv)   
+            # for gv in fsm_return_statement.global_variables:
+            #         ret_global_vars.append(gv)   
+            ret_global_vars    += fsm_return_statement.global_variables
+            ret_return_nodes   += fsm_return_statement.return_nodes
+            ret_break_nodes    += fsm_return_statement.break_nodes
+            ret_continue_nodes += fsm_return_statement.continue_nodes        
+                    
                     
             node_start.transitions.append(FSMTransition([], case.condition, fsm_return_statement.starting_node))
             fsm_return_statement.ending_node.transitions.append(FSMTransition([], "", node_end))
@@ -246,7 +333,7 @@ class StatementIf(Statement):
         if not is_else_case_avaliable: 
             node_start.transitions.append(FSMTransition([], "", node_end))
         
-        return TO_FSM_Return(node_start, node_end, ret_global_vars)
+        return TO_FSM_Return(node_start, node_end, ret_global_vars, ret_return_nodes, ret_break_nodes, ret_continue_nodes)
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -261,10 +348,10 @@ class StatementDeclaration(Statement):
         if self.make_global:
             node = FSMNode([], [])
             global_var = FSMGlobalVar(self.datatype, self.variable)
-            return TO_FSM_Return(node, node, [global_var])
+            return TO_FSM_Return(node, node, [global_var], [], [], [])
         else:
             node = FSMNode([code_template.DECLARE_LOCAL_VARIABLE(self.datatype, self.variable)], [])
-            return TO_FSM_Return(node, node, [])
+            return TO_FSM_Return(node, node, [], [], [], [])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -280,10 +367,10 @@ class StatementDeclarationInit(Statement):
         if self.make_global:
             node = FSMNode([code_template.LOCAL_VARIABLE_ASSIGNMENT(self.variable, self.expression)], [])
             global_var = FSMGlobalVar(self.datatype, self.variable)
-            return TO_FSM_Return(node, node, [global_var])
+            return TO_FSM_Return(node, node, [global_var], [], [], [])
         else:
             node = FSMNode([code_template.DECLARE_LOCAL_VARIABLE_INIT(self.datatype, self.variable, self.expression)], [])
-            return TO_FSM_Return(node, node, [])
+            return TO_FSM_Return(node, node, [], [], [], [])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -300,7 +387,7 @@ class StatementWait(Statement):
             # YIELD statement
             node = FSMNode([], [], False, "true") # the program will always entry this node, no block. 
             # this helps the optimization
-            return TO_FSM_Return(node, node, [])
+            return TO_FSM_Return(node, node, [], [], [], [])
         else:
             # WAIT statement
             node_register_time = FSMNode([code_template.REGISTER_TIME(fsm_name)], [])
@@ -308,7 +395,7 @@ class StatementWait(Statement):
             
             node_register_time.transitions.append(FSMTransition([], "", node_entry_until))
             
-            return TO_FSM_Return(node_register_time, node_entry_until, [])
+            return TO_FSM_Return(node_register_time, node_entry_until, [], [], [], [])
             
     
     def print_pretty(self, indentation:int=0) -> str:
@@ -320,7 +407,7 @@ class StatementWaitUnless(Statement):
     
     def to_fsm(self, fsm_name:str|None=None) -> TO_FSM_Return:
         node = FSMNode([], [], False, self.condition)
-        return TO_FSM_Return(node, node, [])
+        return TO_FSM_Return(node, node, [], [], [], [])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -329,7 +416,8 @@ class StatementWaitUnless(Statement):
 class StatementBreak(Statement): 
     
     def to_fsm(self, fsm_name:str|None=None) -> TO_FSM_Return:
-        pass
+        node = FSMNode([], [])
+        return TO_FSM_Return(node, node, [], [], [node], [])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -337,7 +425,8 @@ class StatementBreak(Statement):
 class StatementContinue(Statement): 
     
     def to_fsm(self, fsm_name:str|None=None) -> TO_FSM_Return:
-        pass
+        node = FSMNode([], [])
+        return TO_FSM_Return(node, node, [], [], [], [node])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -345,7 +434,8 @@ class StatementContinue(Statement):
 class StatementReturn(Statement): 
     
     def to_fsm(self, fsm_name:str|None=None) -> TO_FSM_Return:
-        pass
+        node = FSMNode([], [])
+        return TO_FSM_Return(node, node, [], [node], [], [])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
@@ -373,6 +463,9 @@ class ParseResult(Statement):
             - starting node
             - ending node
             - list of global variables
+            - return_nodes: list[FSMNode] <- This should be empty
+            - break_nodes: list[FSMNode] <- This should be empty
+            - continue_nodes: list[FSMNode] <- This should be empty
         """
         
         fsm_name = self.function_name
@@ -382,13 +475,37 @@ class ParseResult(Statement):
         ret_global_vars = []
         
         fsm_return_statement = self.statements.to_fsm(fsm_name)
-        for gv in fsm_return_statement.global_variables:
-            ret_global_vars.append(gv)
+        # for gv in fsm_return_statement.global_variables:
+        #     ret_global_vars.append(gv)
+        ret_global_vars    += fsm_return_statement.global_variables
+        
             
         node_start.transitions.append(FSMTransition([], "", fsm_return_statement.starting_node))
         fsm_return_statement.ending_node.transitions.append(FSMTransition([], "", node_end))
         
-        return TO_FSM_Return(node_start, node_end, ret_global_vars)
+        # continue statement
+        if len(fsm_return_statement.continue_nodes) > 0:
+            # clear all extra transitions and point all the node to continue node
+            for continue_node in fsm_return_statement.continue_nodes:
+                continue_node.transitions.clear()
+                continue_node.transitions.append(FSMTransition([], "", node_start))
+        
+        # break statement
+        if len(fsm_return_statement.break_nodes) > 0:
+            # clear all extra transitions and point all the node to break node
+            for break_node in fsm_return_statement.break_nodes:
+                break_node.transitions.clear()
+                break_node.transitions.append(FSMTransition([], "", node_end))
+           
+        # return statement
+        if len(fsm_return_statement.return_nodes) > 0:
+            # clear all extra transitions and point all the node to break node
+            for return_node in fsm_return_statement.return_nodes:
+                return_node.transitions.clear()
+                return_node.transitions.append(FSMTransition([], "", node_end))     
+            
+        
+        return TO_FSM_Return(node_start, node_end, ret_global_vars, [], [], [])
     
     def print_pretty(self, indentation:int=0) -> str:
         pass
