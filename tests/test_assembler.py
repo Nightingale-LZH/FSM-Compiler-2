@@ -935,9 +935,9 @@ class TestAssemblerFunctionality(unittest.TestCase):
         """
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s))
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
         set_return = assembler.traverse_fsm(fsm.starting_node)
-        # self.assertEqual(len(set_return), 3)
+        self.assertEqual(len(set_return), 7)
     
     
 if __name__ == "__main__":

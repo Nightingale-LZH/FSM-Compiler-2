@@ -118,16 +118,16 @@ class StatementBlock(Statement):
         
         node_end = node_start
         for line in self.lines:
-            fsm_return_statement = line.to_fsm(fsm_name)
             
-            # for gv in fsm_return_statement.global_variables:
-            #     ret_global_vars.append(gv)
-                
+            # process statements
+            fsm_return_statement = line.to_fsm(fsm_name)
+
             ret_global_vars    += fsm_return_statement.global_variables
             ret_return_nodes   += fsm_return_statement.return_nodes
             ret_break_nodes    += fsm_return_statement.break_nodes
             ret_continue_nodes += fsm_return_statement.continue_nodes
                 
+            # add basic transitions       
             node_end.transitions.append(FSMTransition([], "", fsm_return_statement.starting_node))
             
             node_end = fsm_return_statement.ending_node
@@ -152,15 +152,16 @@ class StatementWhile(Statement):
         ret_global_vars = []
         ret_return_nodes = []
         
+        # process on all statements
         fsm_return_statement = self.statements.to_fsm(fsm_name)
-        # for gv in fsm_return_statement.global_variables:
-        #         ret_global_vars.append(gv)
-        ret_global_vars    += fsm_return_statement.global_variables
-        ret_return_nodes   += fsm_return_statement.return_nodes
+        ret_global_vars  += fsm_return_statement.global_variables
+        ret_return_nodes += fsm_return_statement.return_nodes
         
+        # add basic transitions       
         node_start.transitions.append(FSMTransition([], self.condition, fsm_return_statement.starting_node))
         node_start.transitions.append(FSMTransition([], "", node_end))
         
+        # Capture CONTINUE and BREAK statement
         # continue statement
         if len(fsm_return_statement.continue_nodes) > 0:
             # clear all extra transitions and point all the node to continue node
@@ -197,17 +198,18 @@ class StatementDoWhile(Statement):
         ret_global_vars = []
         ret_return_nodes = []
         
+        # process on all statements
         fsm_return_statement = self.statements.to_fsm(fsm_name)
-        # for gv in fsm_return_statement.global_variables:
-        #         ret_global_vars.append(gv)
-        ret_global_vars    += fsm_return_statement.global_variables
-        ret_return_nodes   += fsm_return_statement.return_nodes
+        ret_global_vars  += fsm_return_statement.global_variables
+        ret_return_nodes += fsm_return_statement.return_nodes
                 
+        # add basic transitions       
         node_start.transitions.append(FSMTransition([], "", fsm_return_statement.starting_node))
         
         fsm_return_statement.ending_node.transitions.append(FSMTransition([], self.condition, node_start))
         fsm_return_statement.ending_node.transitions.append(FSMTransition([], "", node_end))
         
+        # Capture CONTINUE and BREAK statement
         # continue statement
         if len(fsm_return_statement.continue_nodes) > 0:
             # clear all extra transitions and point all the node to continue node
@@ -245,22 +247,18 @@ class StatementFor(Statement):
         ret_global_vars = []
         ret_return_nodes = []
         
+        # process on all statements
         fsm_return_initialization = self.initialization.to_fsm(fsm_name)
-        # for gv in fsm_return_initialization.global_variables:
-        #         ret_global_vars.append(gv)
         ret_global_vars += fsm_return_initialization.global_variables
                 
         fsm_return_update = self.update.to_fsm(fsm_name)
-        # for gv in fsm_return_update.global_variables:
-        #         ret_global_vars.append(gv)
         ret_global_vars += fsm_return_update.global_variables
         
         fsm_return_statement = self.statements.to_fsm(fsm_name)
-        # for gv in fsm_return_statement.global_variables:
-        #         ret_global_vars.append(gv)
-        ret_global_vars += fsm_return_statement.global_variables
-        ret_return_nodes   += fsm_return_statement.return_nodes
-                
+        ret_global_vars  += fsm_return_statement.global_variables
+        ret_return_nodes += fsm_return_statement.return_nodes
+        
+        # add basic transitions       
         node_start.transitions.append(FSMTransition([], "", fsm_return_initialization.starting_node))
         fsm_return_initialization.ending_node.transitions.append(FSMTransition([], "", node_loop_start))
         
@@ -270,6 +268,7 @@ class StatementFor(Statement):
         fsm_return_statement.ending_node.transitions.append(FSMTransition([], "", fsm_return_update.starting_node))
         fsm_return_update.ending_node.transitions.append(FSMTransition([], "", node_loop_start))
         
+        # Capture CONTINUE and BREAK statement
         # continue statement
         if len(fsm_return_statement.continue_nodes) > 0:
             # clear all extra transitions and point all the node to continue node
@@ -319,8 +318,6 @@ class StatementIf(Statement):
                 is_else_case_avaliable = True
             
             fsm_return_statement = case.statements.to_fsm(fsm_name)
-            # for gv in fsm_return_statement.global_variables:
-            #         ret_global_vars.append(gv)   
             ret_global_vars    += fsm_return_statement.global_variables
             ret_return_nodes   += fsm_return_statement.return_nodes
             ret_break_nodes    += fsm_return_statement.break_nodes
@@ -475,9 +472,7 @@ class ParseResult(Statement):
         ret_global_vars = []
         
         fsm_return_statement = self.statements.to_fsm(fsm_name)
-        # for gv in fsm_return_statement.global_variables:
-        #     ret_global_vars.append(gv)
-        ret_global_vars    += fsm_return_statement.global_variables
+        ret_global_vars += fsm_return_statement.global_variables
         
             
         node_start.transitions.append(FSMTransition([], "", fsm_return_statement.starting_node))
