@@ -87,10 +87,276 @@ flowchart BT
 - Return `ParseResult` if parse successfully, otherwise, return `None`.
 - `ParseResult` is the processed AST; `ParseResult.lark_ast` is the raw AST immediately returned from the lark parser.
 
+## FSM Optimizations
+
+FSM optimization simplifies redundant FSM generated from AST. The optimization algorithm implement fix-point algorithm, i.e., repetitively applying optimization until the result FSM no longer changes.
+
+There are 5 levels of optimizations.
+
+### L1, Optimize Consecutive States  
+
+Note: **This optimization will collapse two collapsible states**
+
+The correctness is the first priority when FSM is generated from AST. When link multiple FSM states together according to the AST, searching the previous and next states is an error-prone process. Therefore, many empty states are added to simplify the linking process.
+
+Additionally, The FSM generation method preemptively marks potentially uncollapsible states to speed up the optimization.
+
+The optimization process is following:
+
+```mermaid
+flowchart LR
+    subgraph Before [ ]
+        direction TB
+        s1([State 1, Collapsible])
+        s2([State 2, Collapsible])
+        s3[State 3, Uncollapsible]
+        s1 --> s2 --> s3
+    end
+    subgraph After [ ]
+        direction TB
+        t1(["`State 1, Collapsible
+              State 2, Collapsible`"])
+        t2[State 3, Uncollapsible]
+        t1 --> t2
+    end
+    Before -->|L1 Optimization| After
+```
+
+### L2, Optimize Chained Empty State
+
+Note: **This optimization will by pass empty states**
+
+When an empty state is sandwiched between two Uncollapsible states, the FSM can bypass the empty state. L1 Optimization cannot resolve this redundancy because it doesn't have check the code block inside the state.
+
+The optimization process is following:
+
+```mermaid
+flowchart LR
+    subgraph Before [ ]
+        direction TB
+        s1[State 1, Uncollapsible]
+        s2([State 2, Empty, Collapsible])
+        s3[State 3, Uncollapsible]
+        s1 --> s2 --> s3
+    end
+    subgraph After [ ]
+        direction TB
+        t1[State 1, Collapsible]
+        t2[State 3, Uncollapsible]
+        t1 --> t2
+    end
+    Before -->|L2 Optimization| After
+```
+
+### L3, Optimize Chained Branching
+
+Note: **This optimization will collapse chained if-else branching**
+
+Chained `IF-ELSE` is a common way to branching out multiple state. The optimizer will identify all Chained `IF-ELSE` behaviors and convert to `switch-liked` behavior, since the `switch-liked` statement doesn't exist in the FSM Compiler grammar.
+
+The optimization process is following:
+
+```mermaid
+flowchart LR
+    subgraph Before [ ]
+        direction TB
+        s1([ ])
+        s2([Branch 1])
+        s3([ ])
+        s4([Branch 2])
+        s5([Branch 3])
+        s1 -->|condition 1| s2
+        s1 -->|else| s3
+        s3 -->|condition 2| s4
+        s3 -->|else| s5
+    end
+    subgraph After [ ]
+        direction TB
+        t1([ ])
+        t2([Branch 1])
+        t4([Branch 2])
+        t5([Branch 3])
+        t1 -->|condition 1| t2
+        t1 -->|condition 2| t4
+        t1 -->|else| t5
+    end
+    Before -->|L3 Optimization| After
+```
+
+#### Interesting Node
+
+L3 Optimization can also optimize `WHILE-IF-ELSE` combination:
+
+FSM Code:
+
+```C
+WHILE (while_condition) {
+    Loop;
+}
+IF (if_condition2) {
+    Branch1;
+} ELSE {
+    Branch2;
+}
+```
+
+FSM Generated:
+
+```mermaid
+flowchart LR
+    subgraph Before [ ]
+        direction TB
+        s1([ ])
+        s2([Loop])
+        s3([ ])
+        s4([Branch 1])
+        s5([Branch 2])
+        s1 -->|while_condition| s2 --> s1
+        s1 --> s3
+        s3 -->|if_condition| s4
+        s3 -->|else| s5
+    end
+    subgraph After [ ]
+        direction TB
+        t1([ ])
+        t2([Loop])
+        t4([Branch 1])
+        t5([Branch 2])
+        t1 -->|while_condition| t2 --> t1
+        t1 -->|if_condition| t4
+        t1 -->|else| t5
+    end
+    Before -->|L3 Optimization| After
+```
+
+### L4, Optimize Chained Merging
+
+Note: **This optimization will collapse chained if-else merging**
+
+This one is the counterpart of L3 optimization, i.e. merging multiple branches.
+
+ Multiple merging states could be created by chained branching, or like L3 optimization, this could be resulted from combination between branching and looping.
+
+The optimization process is following:
+
+```mermaid
+flowchart LR
+    subgraph Before [ ]
+        direction TB
+        s1([Branch 1])
+        s2([Branch 2])
+        s3([ ])
+        s4([Branch 3])
+        s5([ ])
+        s1 & s2 --> s3
+        s3 & s4 --> s5
+    end
+    subgraph After [ ]
+        direction TB
+        t1([Branch 1])
+        t2([Branch 2])
+        t4([Branch 3])
+        t5([ ])
+        t1 & t2 & t4  --> t5
+    end
+    Before -->|L4 Optimization| After
+```
+
+### L5, Optimize Consecutive Uncollapsible States
+
+Node: **This optimization will analyze the collapsibility among consecutive states and potentially collapse them**
+
+The structural control statement (`BREAK`, `CONTINUE`, and `RETURN`) will alter the naively labelled uncollapsible state. Even though the resulting FSM is correct, but the altered structure might be further optimized by analyze all incoming and outgoing transition for all states. This process is slow because incoming transition is not tracked and need manually trace back.
+
+The optimization process is following:
+
+```mermaid
+flowchart LR
+    subgraph Before [ ]
+        direction TB
+        s1[State 1, Uncollapsible]
+        s2["`State 2, 
+             Marked as Uncollapsible
+             But technically collapsible`"]
+        s3[State 3, Uncollapsible]
+        s1 --> s2 --> s3
+    end
+    subgraph After [ ]
+        direction TB
+        t1["`State 1, Uncollapsible
+              State 2 Uncollapsible`"]
+        t2[State 3, Uncollapsible]
+        t1 --> t2
+    end
+    Before -->|L5 Optimization| After
+```
+
+#### Example
+
+When optimize following code, the `RETURN` statement will make "Operation3" state potentially collapsible.
+
+```C
+FSM example_fsm () {
+    IF (condition) {
+        Operation1;
+        RETURN;
+    } ELSE {
+        Operation2;
+    }
+    Operation3;
+}
+```
+
+The code above will generate following FSM. 
+
+```mermaid
+flowchart LR
+    subgraph Before[ ]
+        direction TB
+        s1[ ]
+        s2[Operation1]
+        s3[Operation2]
+        s4[Operation3]
+        s5[ ]
+
+        s1 -->|condition| s2
+        s1 -->|else| s3
+        s2 -.-> s4
+
+        s2 ==>|RETURN| s5
+
+        s4 --> s5
+        s3 --> s4
+    end
+
+    subgraph After[ ]
+        direction TB
+        t1[ ]
+        t2[Operation1]
+        t3["`Operation2
+             Operation3`"]
+        t5[ ]
+
+        t1 -->|condition| t2
+        t1 -->|else| t3
+
+        t2 ==>|RETURN| t5
+
+        t3 --> t5
+    end
+
+    Before -->|L5 Optimization| After
+```
+
+The `RETURN` transition is labelled in bold, and the dotted arrow is the ghosted transition shadowed by `RETURN` transition.
+
+We can collapse "Operation2" and "Operation3" safely because "Operation1" will never follow by "Operation3"
+
 ## Roadmap
 
 - [ ] Function call to other FSM
 - [ ] C++ templating, i.e. generics
 - [x] ~~Structural controls like `break`, `continue`, `return`~~
 - [ ] Error state, analogs to ending state
+- [ ] L6(?) Optimization, convert Moore state to Mealy transition.
 
