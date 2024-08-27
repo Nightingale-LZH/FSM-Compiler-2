@@ -938,6 +938,22 @@ class TestAssemblerFunctionality(unittest.TestCase):
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
         set_return = assembler.traverse_fsm(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
+        
+    def test_to_fsm_opt_for_continue_stmt(self):        
+        s = """
+        FSM function_name_opt9() { 
+            FOR(GLOBAL int i = 0; i < 5; i++) {
+                IF (i == 1) { CONTINUE; }
+                print(i);
+            }
+        }
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s))
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 6)
+    
     
     
 if __name__ == "__main__":

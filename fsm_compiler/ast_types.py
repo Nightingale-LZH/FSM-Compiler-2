@@ -274,7 +274,10 @@ class StatementFor(Statement):
             # clear all extra transitions and point all the node to continue node
             for continue_node in fsm_return_statement.continue_nodes:
                 continue_node.transitions.clear()
-                continue_node.transitions.append(FSMTransition([], "", node_start))
+                continue_node.transitions.append(FSMTransition([], "", fsm_return_update.starting_node))
+              
+            # multiple node will point to end node, then the end node will be uncollapsible  
+            fsm_return_update.starting_node.collapsible = False
         
         # break statement
         if len(fsm_return_statement.break_nodes) > 0:
