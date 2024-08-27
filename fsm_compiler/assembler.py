@@ -661,20 +661,20 @@ def optimize_fsm_consecutive_uncollapsible_states(fsm_starting_node:FSMNode) -> 
 #                 FSM Optimization                   #
 # -------------------------------------------------- #
 
-OPTIMIZATION_STRATEGIES = [
-    optimize_fsm_consecutive_states,
-    optimize_fsm_chained_empty_state,
-    optimize_fsm_chained_branching,
-    optimize_fsm_chained_merging,
-    optimize_fsm_consecutive_uncollapsible_states,
-]
-
+OPTIMIZATION_STRATEGIES = {
+    1: optimize_fsm_consecutive_states,
+    2: optimize_fsm_chained_empty_state,
+    3: optimize_fsm_chained_branching,
+    4: optimize_fsm_chained_merging,
+    5: optimize_fsm_consecutive_uncollapsible_states,
+}
+    
 def optimize_fsm(fsm_starting_node:FSMNode, opt_level:int=5) -> None:
     opt_level = min(opt_level, len(OPTIMIZATION_STRATEGIES))
     is_changed = True
     while (is_changed):
         is_changed = False
-        for level in range(opt_level):
+        for level in range(1, opt_level + 1):
             while OPTIMIZATION_STRATEGIES[level](fsm_starting_node):
                 is_changed = True
 

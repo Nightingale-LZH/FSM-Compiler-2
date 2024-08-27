@@ -283,7 +283,7 @@ flowchart LR
     Before -->|L5 Optimization| After
 ```
 
-#### Example]
+#### Example
 
 When optimize following code, the `RETURN` statement will make "Operation3" state potentially collapsible.
 
