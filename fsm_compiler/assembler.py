@@ -657,6 +657,73 @@ def optimize_fsm_consecutive_uncollapsible_states(fsm_starting_node:FSMNode) -> 
     return has_modified_master
 
 
+def optimize_fsm_mealy_machine_convertion(fsm_starting_node:FSMNode) -> bool:
+    """optimize Add Mealy transition to futher optimize fsm
+    
+    This optimization will add transition mealy transition, do not pass the resulting fsm to previous optimizers
+    
+    collapse if 
+        - the next node is truely collapsible
+        - the next node have only one transition to other node
+        
+    the node is truely collapsible if and only if 
+        - only one trace-back-transition
+        - does not have entry condition
+        - the node has more than 1 transitions to other nodes (so, this is not end node)
+    
+    this function will modifiy the given fsm. Does NOT return a new FSM
+    
+    Parameters
+    ----------
+    fsm_starting_node : FSMNode
+        Starting Node
+
+    Returns
+    -------
+    bool
+        If the fsm is modified at all
+    """
+    
+    # implement fix-point algorithm
+    
+    has_modified = True
+    while (has_modified):
+        has_modified = False
+        has_modified_master = False
+        
+        searched_nodes: set[FSMNode] = set()
+    
+        search_queue: list[FSMNode] = []
+        
+        search_queue.append(fsm_starting_node)
+        while len(search_queue) != 0:
+            node_curr = search_queue.pop(0) 
+            
+            searched_nodes.add(node_curr)
+            
+            # collapse if 
+            #   - the next node is truely collapsible
+            #   - the next node have only one transition to other node
+            
+            if len(node_curr.transitions) == 0:
+                continue
+            else:
+                for transition in node_curr.transitions:
+                    node_next: FSMNode = transition.target_node
+                    
+                    if (
+                        is_truly_collapsible(node_next)
+                        and len(node_next.transitions) == 1
+                    ):
+                        transition.code_block += node_next.code_block
+                        transition.target_node = node_next.transitions
+                        
+                    else:
+                        if node_next not in searched_nodes:
+                            search_queue.append(node_next)
+    
+    return has_modified_master
+
 # -------------------------------------------------- #
 #                 FSM Optimization                   #
 # -------------------------------------------------- #

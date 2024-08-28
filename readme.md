@@ -89,7 +89,7 @@ flowchart BT
 
 ## FSM Optimizations
 
-FSM optimization simplifies redundant FSM generated from AST. The optimization algorithm implement fix-point algorithm, i.e., repetitively applying optimization until the result FSM no longer changes.
+FSM optimization simplifies redundant FSM generated from AST. The optimization algorithm is based on fix-point algorithm, i.e., repetitively applying optimization until the result FSM no longer changes.
 
 There are 5 levels of optimizations.
 

@@ -1224,7 +1224,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         """
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s))
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
         set_return = assembler.traverse_fsm(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
     
@@ -1538,6 +1538,21 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
         set_return = assembler.traverse_fsm(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
+        
+class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
+    def test_to_fsm_opt1(self):        
+        s = """
+        FSM function_name_opt1() { 
+            FOR(GLOBAL int i = 0; i < 5; i++) {
+                print("hello world!");
+            }
+        }
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 4)
     
 if __name__ == "__main__":
     logging.basicConfig(level=logging.CRITICAL)
