@@ -85,16 +85,31 @@ def fsm_to_mermaid(fsm_starting_node:FSMNode, debug:bool=False) -> str:
     for state in states:
         for transition in state.transitions:
             if transition.condition == "":
-                ret_val += '   {} --> {}\n'.format(
-                    id(state), 
-                    id(transition.target_node)
-                ) 
+                if len(transition.code_block) == 0:
+                    ret_val += '   {} --> {}\n'.format(
+                        id(state), 
+                        id(transition.target_node)
+                    ) 
+                else:
+                    ret_val += '   {} -->|"`*------*\n{}`"| {}\n'.format(
+                        id(state), 
+                        purge_code_as_mermaid_commend("\n".join(transition.code_block)), 
+                        id(transition.target_node)
+                    ) 
             else: 
-                ret_val += '   {} -->|"`{}`"| {}\n'.format(
-                    id(state), 
-                    purge_code_as_mermaid_commend(transition.condition), 
-                    id(transition.target_node)
-                ) 
+                if len(transition.code_block) == 0:
+                    ret_val += '   {} -->|"`{}`"| {}\n'.format(
+                        id(state), 
+                        purge_code_as_mermaid_commend(transition.condition), 
+                        id(transition.target_node)
+                    ) 
+                else:
+                    ret_val += '   {} -->|"`{}\n*------*\n{}`"| {}\n'.format(
+                        id(state), 
+                        purge_code_as_mermaid_commend(transition.condition), 
+                        purge_code_as_mermaid_commend("\n".join(transition.code_block)), 
+                        id(transition.target_node)
+                    ) 
     
     ret_val += "```"
     return ret_val
@@ -172,16 +187,31 @@ def fsm_to_graphviz_dot(fsm_starting_node:FSMNode, debug:bool=False) -> str:
     for state in states:
         for transition in state.transitions:
             if transition.condition == "":
-                ret_val += '   {} -> {};\n'.format(
-                    STATE_LABEL(state), 
-                    STATE_LABEL(transition.target_node)
-                ) 
+                if len(transition.code_block) == 0:
+                    ret_val += '   {} -> {};\n'.format(
+                        STATE_LABEL(state), 
+                        STATE_LABEL(transition.target_node)
+                    ) 
+                else:
+                    ret_val += '   {} -> {} [label="-----\\n{}"];\n'.format(
+                        STATE_LABEL(state), 
+                        STATE_LABEL(transition.target_node),
+                        "\\n".join([purge_code_as_graphviz_dot_commend(line) for line in transition.code_block]), 
+                    ) 
             else: 
-                ret_val += '   {} -> {} [label="{}"];\n'.format(
-                    STATE_LABEL(state), 
-                    STATE_LABEL(transition.target_node),
-                    purge_code_as_graphviz_dot_commend(transition.condition), 
-                ) 
+                if len(transition.code_block) == 0:
+                    ret_val += '   {} -> {} [label="{}"];\n'.format(
+                        STATE_LABEL(state), 
+                        STATE_LABEL(transition.target_node),
+                        purge_code_as_graphviz_dot_commend(transition.condition), 
+                    ) 
+                else:
+                    ret_val += '   {} -> {} [label="{}\\n-----\\n{}"];\n'.format(
+                        STATE_LABEL(state), 
+                        STATE_LABEL(transition.target_node),
+                        purge_code_as_graphviz_dot_commend(transition.condition), 
+                        "\\n".join([purge_code_as_graphviz_dot_commend(line) for line in transition.code_block]), 
+                    ) 
     
     ret_val += "}"
     return ret_val

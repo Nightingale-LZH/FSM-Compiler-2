@@ -583,8 +583,10 @@ def optimize_fsm_consecutive_uncollapsible_states(fsm_starting_node:FSMNode) -> 
     
     The node is collapsible if
         - only one trace-back-transition
+        - the trace-back-transition does not have transition condition
         - does not have entry condition
-        - the node has more than 1 transitions to other nodes (so, this is not end node)
+        - the node has equal or greater than 1 transitions to other nodes (so, this is not end node)
+        - the node is not beginning node
     
     this function will modifiy the given fsm. Does NOT return a new FSM
     
@@ -664,12 +666,10 @@ def optimize_fsm_mealy_machine_convertion(fsm_starting_node:FSMNode) -> bool:
     
     collapse if 
         - the next node is truely collapsible
+            - only one trace-back-transition
+            - does not have entry condition
+            - the node is not beginning node
         - the next node have only one transition to other node
-        
-    the node is truely collapsible if and only if 
-        - only one trace-back-transition
-        - does not have entry condition
-        - the node has more than 1 transitions to other nodes (so, this is not end node)
     
     this function will modifiy the given fsm. Does NOT return a new FSM
     
@@ -702,8 +702,11 @@ def optimize_fsm_mealy_machine_convertion(fsm_starting_node:FSMNode) -> bool:
             searched_nodes.add(node_curr)
             
             # collapse if 
-            #   - the next node is truely collapsible
-            #   - the next node have only one transition to other node
+            # - the next node is truely collapsible
+            #     - only one trace-back-transition
+            #     - does not have entry condition
+            #     - the node is not beginning node
+            # - the next node have only one transition to other node
             
             if len(node_curr.transitions) == 0:
                 continue
@@ -711,13 +714,20 @@ def optimize_fsm_mealy_machine_convertion(fsm_starting_node:FSMNode) -> bool:
                 for transition in node_curr.transitions:
                     node_next: FSMNode = transition.target_node
                     
+                    traced_back_transitions = trace_back_transition(node_next, fsm_starting_node)
+    
                     if (
-                        is_truly_collapsible(node_next)
-                        and len(node_next.transitions) == 1
+                        len(node_next.transitions) == 1
+                        and len(traced_back_transitions) == 1
+                        and node_next.entry_condition == ""
+                        and id(node_next) != id(fsm_starting_node)
                     ):
                         transition.code_block += node_next.code_block
-                        transition.target_node = node_next.transitions
+                        transition.target_node = node_next.transitions[0].target_node
                         
+                        has_modified = True
+                        has_modified_master = True
+                        break
                     else:
                         if node_next not in searched_nodes:
                             search_queue.append(node_next)
@@ -734,15 +744,23 @@ OPTIMIZATION_STRATEGIES = {
     3: optimize_fsm_chained_branching,
     4: optimize_fsm_chained_merging,
     5: optimize_fsm_consecutive_uncollapsible_states,
+    10: optimize_fsm_mealy_machine_convertion,
 }
     
 def optimize_fsm(fsm_starting_node:FSMNode, opt_level:int=5) -> None:
-    opt_level = min(opt_level, len(OPTIMIZATION_STRATEGIES))
+    opt_level_moore = min(opt_level, 5)
     is_changed = True
     while (is_changed):
         is_changed = False
-        for level in range(1, opt_level + 1):
+        for level in range(1, opt_level_moore + 1):
             while OPTIMIZATION_STRATEGIES[level](fsm_starting_node):
                 is_changed = True
 
-
+    # level 10 and above
+    opt_level_mealy = opt_level
+    is_changed = True
+    while (is_changed):
+        is_changed = False
+        for level in range(10, opt_level_mealy + 1):
+            while OPTIMIZATION_STRATEGIES[level](fsm_starting_node):
+                is_changed = True
