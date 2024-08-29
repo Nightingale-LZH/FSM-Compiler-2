@@ -2,6 +2,8 @@
 
 Write the finite state machine as if it's an ordinary function.
 
+**This project is in development.**
+
 ## Overview
 
 This project used the Lark module as the basic lexer and parser. The grammar is written in [extended Backus–Naur form (EBNF)](https://en.wikipedia.org/wiki/Extended_Backus–Naur_form).
@@ -46,6 +48,8 @@ When using structural control statement: `BREAK`, `CONTINUE` at the top level of
 - `BREAK` will move the instruction pointer to the end of the function. In this case, `BREAK` is equivalent to `RETURN`.
 - `CONTINUE` will move the instruction pointer to the beginning of the function. In other words, this will restart the function in this case.
 
+## Usage
+
 ## Module Structure
 
 - **`parser.py`**: Parse the C/C++ function into an Abstract Syntax Tree (AST). This is the combination of lexer and parser.
@@ -70,22 +74,72 @@ flowchart BT
     cg --> ast & asm & code
 ```
 
-### State Number Assignment and Special State
+## Major Functions
 
-- Starting state is 0
-- Ending state is 1
-- Any regular state has a two-digit state number, i.e., `state_number >= 10`
+The block diagram of this FSM Compiler:
 
-### parser.py
+```mermaid
+flowchart LR
+    original_code[Original C/C++ Code]
 
-**Important Functions:**
+    subgraph parser[generate_AST_from_code]
+        direction LR
+        lark_parser[Lark Parser]
+        fsm_parser[Parser]
+    end
 
-`parse_to_AST(input_str:str) -> ParseResult|None`
+    subgraph assember[generate_FSM_from_AST]
+        direction LR
+        translator[FSM Translator]
+        optimizer[Optimizer]
+    end
+
+    subgraph code_gen[generate_code_from_FSM]
+        c_code_gen[C/C+ Code Generator]
+    end
+
+    fsm_code[FSM C/C++ Code]
+
+    original_code --> lark_parser
+    lark_parser --> |Lark AST| fsm_parser
+    fsm_parser -->|AST| translator
+    translator -->|Raw FSM| optimizer
+    optimizer -->|FSM| c_code_gen
+    c_code_gen --> fsm_code
+```
+
+### `generate_AST_from_code(input_str:str) -> ParseResult|None`
 
 - Parse the given code to AST.
 - `input_str` is the C/C++ code, and it must start at the FSM function.
 - Return `ParseResult` if parse successfully, otherwise, return `None`.
 - `ParseResult` is the processed AST; `ParseResult.lark_ast` is the raw AST immediately returned from the lark parser.
+- `parse_to_AST(input_str:str) -> ParseResult|None` is the alias of `generate_AST_from_code`.
+
+### `generate_FSM_from_AST(parse_result: ParseResult, optimization_level:int=5) -> FSMMachine`
+
+- Convert AST to FSM
+- Optimize FSM, See more in [FSM Optimizations](#fsm-optimizations) Section
+- The result `FSMMachine` is the FSM contain all information about states, transitions, and global variables. 
+
+### `generate_code_from_FSM(fsm:FSMMachine, ...) -> str:`
+
+- Convert FSM to C/C++ code.
+  - `void <FUNCTION_NAME>()` will be generated. 
+  - This FSM entry point that run the FSM for 1 iteration. In other words, this is the "tick" function.
+- Optionally, this function will generate additional FSM entry point that helps FSM scheduling:
+  - When `generate_fix_iteration_function` is `True`, by default `True`.
+    - `void <FUNCTION_NAME>_fixed_iteration(unsigned int count)` will be generated.
+    - `count` specifies the number of iteration this FSM will run.
+  - When `generate_minimum_timed_function` is `True`, by default `True`.
+    - `void <FUNCTION_NAME>_min_runtime(unsigned long ms)` will be generated.
+    - `ms` specifies the minimum milliseconds that FSM will run.
+
+## State Number Assignment and Special State
+
+- Starting state is 0
+- Ending state is 1
+- Any regular state has a two-digit state number, i.e., `state_number >= 10`
 
 ## FSM Optimizations
 
@@ -359,4 +413,5 @@ We can collapse "Operation2" and "Operation3" safely because "Operation1" will n
 - [x] ~~Structural controls like `break`, `continue`, `return`~~
 - [ ] Error state, analogs to ending state
 - [ ] L6(?) Optimization, convert Moore state to Mealy transition.
+- [ ] Add more comment in the codes
 

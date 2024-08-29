@@ -39,7 +39,7 @@ def fsm_to_mermaid(fsm_starting_node:FSMNode, debug:bool=False) -> str:
     str
         return a string that illustrate the fsm in mermaid 
     """
-    states = assembler.traverse_fsm(fsm_starting_node)
+    states = assembler.traverse_FSM(fsm_starting_node)
     
     ret_val = "```mermaid\nflowchart TB\n"
     
@@ -131,7 +131,7 @@ def fsm_to_graphviz_dot(fsm_starting_node:FSMNode, debug:bool=False) -> str:
     
     STATE_LABEL = lambda node: "s{}".format(id(node))
     
-    states = assembler.traverse_fsm(fsm_starting_node)
+    states = assembler.traverse_FSM(fsm_starting_node)
     
     ret_val = "digraph {\n"
     
@@ -193,27 +193,38 @@ def fsm_to_graphviz_dot(fsm_starting_node:FSMNode, debug:bool=False) -> str:
 #                     C++ Code Gen                   #
 # -------------------------------------------------- #
 
-def generate_code_from_FSM(fsm:FSMMachine) -> str:
+def generate_code_from_FSM(
+    fsm:FSMMachine, 
+    generate_fix_iteration_function:bool=True, 
+    generate_minimum_timed_function:bool=True,
+) -> str:
     """Generate Code from Given FSM
+    
+    Optionally, the code will contain addtional FSM entry points that faciliate the FSM scheduling.
 
     Parameters
     ----------
     fsm : FSMMachine
         Finite State Machine from Assembler process
+    generate_fix_iteration_function : bool, optional
+        The FSM entry point that run the FSM for given fix number of times, 
+        by default True
+    generate_minimum_timed_function : bool, optional
+        The FSM entry that run the FSM for minimum given millisecond, 
+        by default True
 
     Returns
     -------
     str
-        Code
-    """
-    # assigning state to an integer
+        C/C++ Code
+    """    
     
     state_to_int:dict[FSMNode, int] = {}
     
     starting_state = fsm.starting_node
-    ending_state = assembler.get_ending_node_of_fsm(starting_state)
+    ending_state = assembler.get_ending_node_of_FSM(starting_state)
     
-    states = assembler.traverse_fsm(starting_state)
+    states = assembler.traverse_FSM(starting_state)
     
     state_counter = 10
     for state in states:
@@ -274,8 +285,12 @@ def generate_code_from_FSM(fsm:FSMMachine) -> str:
         )
         
     aux_function_stms: list[code_template.CPP_CODE_RenderingTemplate] = []
-    aux_function_stms.append(code_template.CPP_CODE_CppFunction_EntryFixedIteration(fsm.fsm_name))
-    aux_function_stms.append(code_template.CPP_CODE_CppFunction_MinimumTimeIteration(fsm.fsm_name))
+    
+    if generate_fix_iteration_function:
+        aux_function_stms.append(code_template.CPP_CODE_CppFunction_EntryFixedIteration(fsm.fsm_name))
+    
+    if generate_minimum_timed_function:
+        aux_function_stms.append(code_template.CPP_CODE_CppFunction_MinimumTimeIteration(fsm.fsm_name))
         
     # generate fsm function
     cpp_function = code_template.CPP_CODE_CppFunction(
