@@ -50,30 +50,6 @@ When using structural control statement: `BREAK`, `CONTINUE` at the top level of
 
 ## Usage
 
-## Module Structure
-
-- **`parser.py`**: Parse the C/C++ function into an Abstract Syntax Tree (AST). This is the combination of lexer and parser.
-- **`assembler.py`**: Convert AST into Finite State Machine. Optimize FSM's. This script contains all FSM-related operations
-- **`ast_types.py`**: Contain dataclasses to construct Custom AST and FSM. The custom AST also has methods to generate rudimentary FSM
-- **`code_template`**: Contain code snippet to reconstruct C++ statements
-- **`code_gen`**: Generate C/C++, Graphvis, and Mermaid codes from FSM
-
-### Dependency
-
-```mermaid
-flowchart BT
-    ast[ast_types.py]
-    psr[parser.py]
-    code[code_template.py]
-    asm[assembler.py]
-    cg[code_gen.py]
-    
-    psr --> ast 
-    ast --> code
-    asm --> ast
-    cg --> ast & asm & code
-```
-
 ## Major Functions
 
 The block diagram of this FSM Compiler:
@@ -134,6 +110,30 @@ flowchart LR
   - When `generate_minimum_timed_function` is `True`, by default `True`.
     - `void <FUNCTION_NAME>_min_runtime(unsigned long ms)` will be generated.
     - `ms` specifies the minimum milliseconds that FSM will run.
+
+## Module Structure
+
+- **`parser.py`**: Parse the C/C++ function into an Abstract Syntax Tree (AST). This is the combination of lexer and parser.
+- **`assembler.py`**: Convert AST into Finite State Machine. Optimize FSM's. This script contains all FSM-related operations
+- **`ast_types.py`**: Contain dataclasses to construct Custom AST and FSM. The custom AST also has methods to generate rudimentary FSM
+- **`code_template`**: Contain code snippet to reconstruct C++ statements
+- **`code_gen`**: Generate C/C++, Graphvis, and Mermaid codes from FSM
+
+### Dependency
+
+```mermaid
+flowchart BT
+    ast[ast_types.py]
+    psr[parser.py]
+    code[code_template.py]
+    asm[assembler.py]
+    cg[code_gen.py]
+    
+    psr --> ast 
+    ast --> code
+    asm --> ast
+    cg --> ast & asm & code
+```
 
 ## State Number Assignment and Special State
 
