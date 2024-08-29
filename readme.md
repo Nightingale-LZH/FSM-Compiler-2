@@ -116,8 +116,8 @@ flowchart LR
 - **`parser.py`**: Parse the C/C++ function into an Abstract Syntax Tree (AST). This is the combination of lexer and parser.
 - **`assembler.py`**: Convert AST into Finite State Machine. Optimize FSM's. This script contains all FSM-related operations
 - **`ast_types.py`**: Contain dataclasses to construct Custom AST and FSM. The custom AST also has methods to generate rudimentary FSM
-- **`code_template`**: Contain code snippet to reconstruct C++ statements
-- **`code_gen`**: Generate C/C++, Graphvis, and Mermaid codes from FSM
+- **`code_template.py`**: Contain code snippet to reconstruct C++ statements
+- **`code_gen.py`**: Generate C/C++, Graphvis, and Mermaid codes from FSM
 
 ### Dependency
 
