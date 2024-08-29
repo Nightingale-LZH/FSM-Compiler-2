@@ -659,7 +659,7 @@ def optimize_FSM_consecutive_uncollapsible_states(fsm_starting_node:FSMNode) -> 
     return has_modified_master
 
 
-def optimize_fsm_mealy_machine_conversion(fsm_starting_node:FSMNode) -> bool:
+def optimize_FSM_mealy_machine_conversion(fsm_starting_node:FSMNode) -> bool:
     """optimize Add Mealy transition to futher optimize fsm
     
     This optimization will add transition mealy transition, do not pass the resulting fsm to previous optimizers
@@ -739,15 +739,15 @@ def optimize_fsm_mealy_machine_conversion(fsm_starting_node:FSMNode) -> bool:
 # -------------------------------------------------- #
 
 OPTIMIZATION_STRATEGIES = {
-    1: optimize_fsm_consecutive_states,
-    2: optimize_fsm_chained_empty_state,
-    3: optimize_fsm_chained_branching,
-    4: optimize_fsm_chained_merging,
-    5: optimize_fsm_consecutive_uncollapsible_states,
-    10: optimize_fsm_mealy_machine_conversion,
+    1: optimize_FSM_consecutive_states,
+    2: optimize_FSM_chained_empty_state,
+    3: optimize_FSM_chained_branching,
+    4: optimize_FSM_chained_merging,
+    5: optimize_FSM_consecutive_uncollapsible_states,
+    10: optimize_FSM_mealy_machine_conversion,
 }
     
-def optimize_fsm(fsm_starting_node:FSMNode, opt_level:int=5) -> None:
+def optimize_FSM(fsm_starting_node:FSMNode, opt_level:int=5) -> None:
     opt_level_moore = min(opt_level, 5)
     is_changed = True
     while (is_changed):

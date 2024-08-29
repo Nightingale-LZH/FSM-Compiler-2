@@ -1207,7 +1207,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
             a++;
         }
         """
-        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s))
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
         set_return = assembler.traverse_FSM(fsm.starting_node)
@@ -1225,7 +1225,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s))
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
     
     
@@ -1512,7 +1512,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 4)
 
     def test_to_fsm_opt16(self):        
@@ -1552,7 +1552,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         
     def test_to_fsm_opt2(self):        
@@ -1576,7 +1576,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_opt3(self):        
@@ -1595,7 +1595,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_opt4(self):        
@@ -1613,7 +1613,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         # self.assertEqual(len(set_return), 6)
         
     def test_to_fsm_optxx1(self):
@@ -1621,7 +1621,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm__optxx2(self):
@@ -1629,7 +1629,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1639,7 +1639,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 4)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 2)
@@ -1649,7 +1649,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1680,7 +1680,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 8)
         self.assertEqual(len(fsm.global_variables), 3)        
         self.assertEqual(len(fsm.global_code_block), 1)
@@ -1691,7 +1691,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1701,7 +1701,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1711,7 +1711,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1755,7 +1755,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 10)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1776,7 +1776,7 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)

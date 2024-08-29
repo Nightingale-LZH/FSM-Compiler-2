@@ -463,4 +463,3 @@ flowchart LR
 - [ ] Error state, analogs to ending state
 - [x] ~~L6(?) Optimization, convert Moore state to Mealy transition.~~
 - [ ] Add more comment in the codes
-
