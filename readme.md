@@ -143,13 +143,28 @@ flowchart BT
 
 ## FSM Optimizations
 
-FSM optimization simplifies redundant FSM generated from AST. The optimization algorithm implement fix-point algorithm, i.e., repetitively applying optimization until the result FSM no longer changes.
+FSM optimization simplifies redundant FSM generated from AST. The optimization algorithm is based on fix-point algorithm, i.e., repetitively applying optimization until the result FSM no longer changes.
 
-There are 5 levels of optimizations.
+### Moore and Mealy Machine Optimization
+
+The raw FSM generated from AST are pure Moore machine because this can simplify the optimization process. Moore machine is FSM whose events or code blocks only depend on the states. Moore machine optimization is enabled by default.
+
+Mealy machine is the FSM that code (or event) that determine by state and transition conditions. Usually Moore machine is more stable because all code block are executed on the clock edge (when tick function is called). Since the input signal and clock signal are not synchronized, Mealy machines might not finish executing code before clock signal changes. However, the output code is sequentially executed by conventional processor (rather than combinational logic), the Mealy machine stability problems occur less frequent, assuming input signal is properly debunked.
+
+Considering Mealy machine is less readable, the Mealy machine optimization should be enabled manually, by setting `optimization_level >= 10`. 
+
+- 5 levels of Moore machine optimizations, single digit level (`level < 10`). Input must be Moore machine.
+  - L1, Optimize Consecutive States  
+  - L2, Optimize Chained Empty State, and all above
+  - L3, Optimize Chained Branching, and all above
+  - L4, Optimize Chained Merging, and all above
+  - L5, Optimize Consecutive Uncollapsible States, and all above
+- 1 level of Mealy machine optimization, two-digit level(`level >= 10`). Mealy machine optimization assume the input is optimized Moore machine.
+  - L10, Optimize FSM by Mealy Machine Conversion, and all above
 
 ### L1, Optimize Consecutive States  
 
-Note: **This optimization will collapse two collapsible states**
+**This optimization will collapse two collapsible states.**
 
 The correctness is the first priority when FSM is generated from AST. When link multiple FSM states together according to the AST, searching the previous and next states is an error-prone process. Therefore, many empty states are added to simplify the linking process.
 
@@ -178,7 +193,7 @@ flowchart LR
 
 ### L2, Optimize Chained Empty State
 
-Note: **This optimization will by pass empty states**
+**This optimization will by pass empty states.**
 
 When an empty state is sandwiched between two Uncollapsible states, the FSM can bypass the empty state. L1 Optimization cannot resolve this redundancy because it doesn't have check the code block inside the state.
 
@@ -204,7 +219,7 @@ flowchart LR
 
 ### L3, Optimize Chained Branching
 
-Note: **This optimization will collapse chained if-else branching**
+**This optimization will collapse chained if-else branching.**
 
 Chained `IF-ELSE` is a common way to branching out multiple state. The optimizer will identify all Chained `IF-ELSE` behaviors and convert to `switch-liked` behavior, since the `switch-liked` statement doesn't exist in the FSM Compiler grammar.
 
@@ -285,7 +300,7 @@ flowchart LR
 
 ### L4, Optimize Chained Merging
 
-Note: **This optimization will collapse chained if-else merging**
+**This optimization will collapse chained if-else merging.**
 
 This one is the counterpart of L3 optimization, i.e. merging multiple branches.
 
@@ -318,7 +333,7 @@ flowchart LR
 
 ### L5, Optimize Consecutive Uncollapsible States
 
-Node: **This optimization will analyze the collapsibility among consecutive states and potentially collapse them**
+**This optimization will analyze the collapsibility among consecutive states and potentially collapse them.**
 
 The structural control statement (`BREAK`, `CONTINUE`, and `RETURN`) will alter the naively labelled uncollapsible state. Even though the resulting FSM is correct, but the altered structure might be further optimized by analyze all incoming and outgoing transition for all states. This process is slow because incoming transition is not tracked and need manually trace back.
 
@@ -367,11 +382,11 @@ The code above will generate following FSM.
 flowchart LR
     subgraph Before[ ]
         direction TB
-        s1[ ]
+        s1([ ])
         s2[Operation1]
         s3[Operation2]
         s4[Operation3]
-        s5[ ]
+        s5([ ])
 
         s1 -->|condition| s2
         s1 -->|else| s3
@@ -385,11 +400,11 @@ flowchart LR
 
     subgraph After[ ]
         direction TB
-        t1[ ]
+        t1([ ])
         t2[Operation1]
         t3["`Operation2
              Operation3`"]
-        t5[ ]
+        t5([ ])
 
         t1 -->|condition| t2
         t1 -->|else| t3
@@ -406,12 +421,46 @@ The `RETURN` transition is labelled in bold, and the dotted arrow is the ghosted
 
 We can collapse "Operation2" and "Operation3" safely because "Operation1" will never follow by "Operation3"
 
+### L10, Optimize FSM by Mealy Machine Conversion
+
+**This optimization convert some state into Mealy machine transition, the resulting FSM will generally have fewer states.**
+
+Mealy machine is the FSM that code (or event) that determine by state and transition conditions. By moving some code blocks into the transitions, the resulting FSM will generally obtain fewer states, and more operations in each state. However, this might not be the desired result, so it is not enabled by default.
+
+The result FSM will be the combination between Moore and Mealy machine. The Mealy conversion will happen if this operation can reduce states.
+
+**This optimization assumes the input FSM is already optimized Moore machine, i.e., the input FSM has already gone through previous optimization.**
+
+**The result mixed Mealy and Moore machine cannot pass into previous optimizations.**
+
+The optimization process is following:
+
+```mermaid
+flowchart LR
+    subgraph Before [ ]
+        direction TB
+        s1[State 1]
+        s2([State 2, code])
+        s3[State 3]
+        s1 -->|condition| s2 --> s3
+    end
+    subgraph After [ ]
+        direction TB
+        t1[State 1]
+        t2[State 3]
+        t1 -->|"`condition
+        -----
+        code`"| t2
+    end
+    Before -->|L10 Optimization| After
+```
+
 ## Roadmap
 
 - [ ] Function call to other FSM
 - [ ] C++ templating, i.e. generics
 - [x] ~~Structural controls like `break`, `continue`, `return`~~
 - [ ] Error state, analogs to ending state
-- [ ] L6(?) Optimization, convert Moore state to Mealy transition.
+- [x] ~~L6(?) Optimization, convert Moore state to Mealy transition.~~
 - [ ] Add more comment in the codes
 

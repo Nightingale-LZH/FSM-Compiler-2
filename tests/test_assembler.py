@@ -1224,8 +1224,8 @@ class TestAssemblerFunctionality(unittest.TestCase):
         """
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s))
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_FSM(fsm.starting_node)
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
     
     
@@ -1369,7 +1369,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
         
-    def test_to_fsm_opt10(self):        
+    def test_to_fsm_optxx10(self):        
         s = """
         FSM function_name_opt9() { 
             DO {
@@ -1478,7 +1478,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
         
-    def test_to_fsm_opt15(self):        
+    def test_to_fsm_opt15a(self):        
         s = """
         FSM function_name_opt9() { 
             IF(a == 0) {
@@ -1512,8 +1512,8 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_FSM(fsm.starting_node)
-        # self.assertEqual(len(set_return), 6)
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 4)
 
     def test_to_fsm_opt16(self):        
         s = """
@@ -1538,7 +1538,250 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
         set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
-    
+        
+        
+class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
+    def test_to_fsm_opt1(self):        
+        s = """
+        FSM function_name_opt1() { 
+            FOR(GLOBAL int i = 0; i < 5; i++) {
+                print("hello world!");
+            }
+        }
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 3)
+        
+    def test_to_fsm_opt2(self):        
+        s = """
+        FSM function_name_opt9() { 
+            IF(a == 0) {
+                a++;
+                BREAK;
+            } ELSE IF (a == 1) {
+                a++;
+                CONTINUE;
+            } ELSE IF (a == 2) {
+                a++;
+                RETURN;
+            } ELSE {
+                a++;
+            }
+            a++;
+        }
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 2)
+        
+    def test_to_fsm_opt3(self):        
+        s = """
+        FSM function_name_opt9() { 
+            IF(a == 0) {
+                BREAK;
+            } ELSE IF (a == 1) {
+                CONTINUE;
+            } ELSE IF (a == 2) {
+                RETURN;
+            } 
+            a++;
+        }
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 2)
+        
+    def test_to_fsm_opt4(self):        
+        s = """
+        FSM function_name_opt9() { 
+            IF(a == 0) {
+                a1++;
+                RETURN;
+            } ELSE {
+                a2++;
+            }  
+            a3++;
+        }
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        # self.assertEqual(len(set_return), 6)
+        
+    def test_to_fsm_optxx1(self):
+        s = "FSM function_name2() { something;    something_else; }"
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 2)
+        
+    def test_to_fsm__optxx2(self):
+        s = "FSM function_name3() { str something.this = \";\" ; regular.statement = \"regular\\\" escaped \\\"\"; }"
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 2)
+        self.assertEqual(len(fsm.global_code_block), 0)
+        self.assertEqual(len(fsm.global_variables), 0)
+        
+    def test_to_fsm_optxx3(self):
+        s = "FSM function_name6() { FOR(GLOBAL int i = 0; i < 1000; i++ ) FOR(GLOBAL int j = 0; j < 1000; j++ ) { printf(\"Hello, world!\"); } }"
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 4)
+        self.assertEqual(len(fsm.global_code_block), 0)
+        self.assertEqual(len(fsm.global_variables), 2)
+        
+    def test_to_fsm_optxx4(self):
+        s =  "FSM function_name10a() { IF(a==1) { print (\"hello, world!\"); } ELSE IF (a==2) { print(\"hello, alt world!\"); } }"
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 3)
+        self.assertEqual(len(fsm.global_code_block), 0)
+        self.assertEqual(len(fsm.global_variables), 0)
+        
+    def test_to_fsm_optxx5(self):
+        s =  """
+        FSM function_name10a() {
+            GLOBAL bool finished = false;
+            IF(a==1) { 
+                print (\"hello, world!\"); 
+            } ELSE IF (a==2) {
+                print(\"hello, alt world!\"); 
+                YIELD; 
+                print("Waited");
+            } ELSE IF (a==3) {
+                print(\"hello, alt world 2!\"); 
+                WAIT(1000/2); 
+                FOR(GLOBAL int i = 0; i < 1000; i++ ) {
+                    FOR(GLOBAL int j = 0; j < i; j++ ) {
+                        DO {
+                            if (!finished) { a++; while (true) {}}
+                        } WHILE (!finished) ;
+                    }
+                }
+            }
+        }
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 8)
+        self.assertEqual(len(fsm.global_variables), 3)        
+        self.assertEqual(len(fsm.global_code_block), 1)
+
+        
+    def test_to_fsm_optxx6(self):
+        s = "FSM function_name2() { WHILE(true) {something;    something_else; }}"
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 2)
+        self.assertEqual(len(fsm.global_code_block), 0)
+        self.assertEqual(len(fsm.global_variables), 0)
+        
+    def test_to_fsm_optxx7(self):
+        s = "FSM function_name2() { DO {something;    something_else; }WHILE(true);}"
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 2)
+        self.assertEqual(len(fsm.global_code_block), 0)
+        self.assertEqual(len(fsm.global_variables), 0)
+        
+    def test_to_fsm_optxx8(self):
+        s = "FSM function_name2() { WHILE(a == 0) { print(\"Doing Things\"); } IF (a==1) {print(\"doing something\"); } }"
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 3)
+        self.assertEqual(len(fsm.global_code_block), 0)
+        self.assertEqual(len(fsm.global_variables), 0)
+        
+    def test_to_fsm_optxx9(self):        
+        s = """
+        FSM function_name_opt9() { 
+            WHILE(a == 0) { 
+                print(\"work 0\"); 
+            } 
+            WHILE(a == 1) {
+                print(\"work 1\"); 
+                DO {
+                    print(\"work 1a\"); 
+                } WHILE (b == 0);
+            }
+            IF (a == 2) {
+                print(\"work 2\"); 
+            } 
+            IF (a == 3) {
+                print(\"work 3\"); 
+                IF (b == 0) {
+                    print(\"work 3a\"); 
+                    YIELD; 
+                    print(\"work 3b\"); 
+                } 
+            } ELSE IF (a == 4) {
+                print(\"work 4a\"); 
+                YIELD; 
+                print(\"work 4b\");
+            } ELSE IF (a == 5) {
+                print(\"work 5a\"); 
+                YIELD; 
+                print(\"work 5b\");
+            } ELSE {
+                print(\"Finally\"); 
+            } 
+        }
+        
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 10)
+        self.assertEqual(len(fsm.global_code_block), 0)
+        self.assertEqual(len(fsm.global_variables), 0)
+        
+    def test_to_fsm_optxx10(self):        
+        s = """
+        FSM function_name_opt9() { 
+            DO {
+                IF (a == 0) {
+                    b++;
+                } ELSE IF (b == 0) {
+                    b--;
+                }
+            } WHILE(true);
+        }
+        
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 10)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_fsm(fsm.starting_node)
+        self.assertEqual(len(set_return), 3)
+        self.assertEqual(len(fsm.global_code_block), 0)
+        self.assertEqual(len(fsm.global_variables), 0)
+        
+        
 if __name__ == "__main__":
     logging.basicConfig(level=logging.CRITICAL)
     # logging.basicConfig(level=logging.WARNING)
