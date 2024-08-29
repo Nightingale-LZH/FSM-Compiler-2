@@ -3,7 +3,7 @@ logger = logging.getLogger(__name__)
 
 from .ast_types import *
 
-def traverse_fsm(fsm_starting_node:FSMNode) -> set[FSMNode]:
+def traverse_FSM(fsm_starting_node:FSMNode) -> set[FSMNode]:
     """get set of all accessable node
 
     Parameters
@@ -52,7 +52,7 @@ def trace_back_transition(fsm_node: FSMNode, fsm_starting_node: FSMNode) -> list
                 
     return [
         transition
-        for node in traverse_fsm(fsm_starting_node)
+        for node in traverse_FSM(fsm_starting_node)
         for transition in node.transitions
         if id(transition.target_node) == id(fsm_node)
     ]
@@ -76,7 +76,7 @@ def check_wait_statement_usage(fsm_starting_node: FSMNode) -> bool:
     """
     generated_wait_statement = code_template.IS_TIME_PASSED("", "")[:-5] # __IS_TIME_PASSED
     
-    for state in traverse_fsm(fsm_starting_node):
+    for state in traverse_FSM(fsm_starting_node):
         if generated_wait_statement in state.entry_condition:
             # contains code that implementing WAIT() stmt
             return True
@@ -109,7 +109,7 @@ def convert_to_raw_state_machine(parse_result: ParseResult) -> FSMMachine:
         fsm_return.global_variables, global_code_block, fsm_return.starting_node, parse_result.function_name
     )
     
-def get_ending_node_of_fsm(fsm_starting_node:FSMNode) -> FSMNode|None:
+def get_ending_node_of_FSM(fsm_starting_node:FSMNode) -> FSMNode|None:
     """Get the ending node of the given fsm
 
     Parameters
@@ -123,12 +123,12 @@ def get_ending_node_of_fsm(fsm_starting_node:FSMNode) -> FSMNode|None:
         return the ending node of ths fsm
         return None if something is wrong
     """
-    for state in traverse_fsm(fsm_starting_node):
+    for state in traverse_FSM(fsm_starting_node):
         if len(state.transitions) == 0:
             return state
     return None
     
-def generate_FSM_from_AST(parse_result: ParseResult, optimization_level:int=4) -> FSMMachine:
+def generate_FSM_from_AST(parse_result: ParseResult, optimization_level:int=5) -> FSMMachine:
     """Generate fsm from parsed AST, and optimize the returning fsm
     
     optimization level details: 
@@ -157,7 +157,7 @@ def generate_FSM_from_AST(parse_result: ParseResult, optimization_level:int=4) -
     """
     
     ret_val = convert_to_raw_state_machine(parse_result)
-    optimize_fsm(ret_val.starting_node, optimization_level)
+    optimize_FSM(ret_val.starting_node, optimization_level)
     
     return ret_val
 
@@ -165,7 +165,7 @@ def generate_FSM_from_AST(parse_result: ParseResult, optimization_level:int=4) -
 #        Context-free Optimization Strategy          #
 # -------------------------------------------------- #
 
-def optimize_fsm_consecutive_states(fsm_starting_node:FSMNode) -> bool:
+def optimize_FSM_consecutive_states(fsm_starting_node:FSMNode) -> bool:
     """optimize consecutive states
     
     collapse if 
@@ -243,7 +243,7 @@ def optimize_fsm_consecutive_states(fsm_starting_node:FSMNode) -> bool:
     
     return has_modified_master
     
-def optimize_fsm_chained_empty_state(fsm_starting_node:FSMNode) -> bool:
+def optimize_FSM_chained_empty_state(fsm_starting_node:FSMNode) -> bool:
     """optimize chained empty state
     
     collapse if
@@ -333,7 +333,7 @@ def optimize_fsm_chained_empty_state(fsm_starting_node:FSMNode) -> bool:
     
     return has_modified_master
 
-def optimize_fsm_chained_branching(fsm_starting_node:FSMNode) -> bool:
+def optimize_FSM_chained_branching(fsm_starting_node:FSMNode) -> bool:
     """optimize chained branching
     
     collapse if
@@ -420,7 +420,7 @@ def optimize_fsm_chained_branching(fsm_starting_node:FSMNode) -> bool:
     
     return has_modified_master
 
-def optimize_fsm_chained_merging(fsm_starting_node:FSMNode) -> bool:
+def optimize_FSM_chained_merging(fsm_starting_node:FSMNode) -> bool:
     """optimize chained merging
     
     WARNING, this might collapse uncollapsible nodes.
@@ -566,7 +566,7 @@ def is_truly_collapsible(fsm_node:FSMNode, fsm_starting_node:FSMNode) -> bool:
     )
 
 
-def optimize_fsm_consecutive_uncollapsible_states(fsm_starting_node:FSMNode) -> bool:
+def optimize_FSM_consecutive_uncollapsible_states(fsm_starting_node:FSMNode) -> bool:
     """optimize consecutive uncollapsible states
     
     This optimization strategy is primary aim for less optimized structure created by BREAK, CONTINUE, 

@@ -19,21 +19,21 @@ class TestBasicFSMAssembler(unittest.TestCase):
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         
     def test_to_fsm_basic_raw_fsm2(self):
         s = "FSM function_name3() { str something.this = \";\" ; regular.statement = \"regular\\\" escaped \\\"\"; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         
     def test_to_fsm_basic_raw_fsm3(self):
         s = "FSM function_name6() { FOR(GLOBAL int i = 0; i < 1000; i++ ) FOR(GLOBAL int i = 0; i < 1000; i++ ) { printf(\"Hello, world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 15)
         
     def test_to_fsm_basic_raw_fsm4(self):
@@ -41,7 +41,7 @@ class TestBasicFSMAssembler(unittest.TestCase):
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 11)
         
     def test_to_fsm_basic_raw_fsm5(self):
@@ -70,7 +70,7 @@ class TestBasicFSMAssembler(unittest.TestCase):
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 36)
         self.assertEqual(len(fsm.global_variables), 3)
         
@@ -84,36 +84,36 @@ class TestOptimizedFSMAssemblerLevel1(unittest.TestCase):
         s = "FSM function_name2() { something;    something_else; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_consecutive_opt2(self):
         s = "FSM function_name3() { str something.this = \";\" ; regular.statement = \"regular\\\" escaped \\\"\"; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_consecutive_opt3(self):
         s = "FSM function_name6() { FOR(GLOBAL int i = 0; i < 1000; i++ ) FOR(GLOBAL int i = 0; i < 1000; i++ ) { printf(\"Hello, world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 8)
         
     def test_to_fsm_consecutive_opt4(self):
         s =  "FSM function_name10a() { IF(a==1) { print (\"hello, world!\"); } ELSE IF (a==2) { print(\"hello, alt world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         
     def test_to_fsm_consecutive_opt5(self):
@@ -141,9 +141,9 @@ class TestOptimizedFSMAssemblerLevel1(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 20)
         self.assertEqual(len(fsm.global_variables), 3)
         
@@ -151,18 +151,18 @@ class TestOptimizedFSMAssemblerLevel1(unittest.TestCase):
         s = "FSM function_name2() { WHILE(true) {something;    something_else; }}"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         
     def test_to_fsm_consecutive_opt7(self):
         s = "FSM function_name2() { DO {something;    something_else; }WHILE(true);}"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 4)
         
         
@@ -177,40 +177,40 @@ class TestOptimizedFSMAssemblerLevel2(unittest.TestCase):
         s = "FSM function_name2() { something;    something_else; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_consecutive_opt2(self):
         s = "FSM function_name3() { str something.this = \";\" ; regular.statement = \"regular\\\" escaped \\\"\"; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_consecutive_opt3(self):
         s = "FSM function_name6() { FOR(GLOBAL int i = 0; i < 1000; i++ ) FOR(GLOBAL int i = 0; i < 1000; i++ ) { printf(\"Hello, world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         
     def test_to_fsm_consecutive_opt4(self):
         s =  "FSM function_name10a() { IF(a==1) { print (\"hello, world!\"); } ELSE IF (a==2) { print(\"hello, alt world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         
     def test_to_fsm_consecutive_opt5(self):
@@ -238,10 +238,10 @@ class TestOptimizedFSMAssemblerLevel2(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 18)
         self.assertEqual(len(fsm.global_variables), 3)
         
@@ -249,20 +249,20 @@ class TestOptimizedFSMAssemblerLevel2(unittest.TestCase):
         s = "FSM function_name2() { WHILE(true) {something;    something_else; }}"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 4)
         
     def test_to_fsm_consecutive_opt7(self):
         s = "FSM function_name2() { DO {something;    something_else; }WHILE(true);}"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
 
 class TestOptimizedFSMAssemblerLevel3(unittest.TestCase):
@@ -277,44 +277,44 @@ class TestOptimizedFSMAssemblerLevel3(unittest.TestCase):
         s = "FSM function_name2() { something;    something_else; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm__opt2(self):
         s = "FSM function_name3() { str something.this = \";\" ; regular.statement = \"regular\\\" escaped \\\"\"; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_opt3(self):
         s = "FSM function_name6() { FOR(GLOBAL int i = 0; i < 1000; i++ ) FOR(GLOBAL int i = 0; i < 1000; i++ ) { printf(\"Hello, world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         
     def test_to_fsm_opt4(self):
         s =  "FSM function_name10a() { IF(a==1) { print (\"hello, world!\"); } ELSE IF (a==2) { print(\"hello, alt world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
         
     def test_to_fsm_opt5(self):
@@ -342,11 +342,11 @@ class TestOptimizedFSMAssemblerLevel3(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 16)
         self.assertEqual(len(fsm.global_variables), 3)
         
@@ -354,33 +354,33 @@ class TestOptimizedFSMAssemblerLevel3(unittest.TestCase):
         s = "FSM function_name2() { WHILE(true) {something;    something_else; }}"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 4)
         
     def test_to_fsm_opt7(self):
         s = "FSM function_name2() { DO {something;    something_else; }WHILE(true);}"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         
     def test_to_fsm_opt8(self):
         s = "FSM function_name2() { WHILE(a == 0) { print(\"Doing Things\"); } IF (a==1) {print(\"doing something\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
         
         
@@ -397,48 +397,48 @@ class TestOptimizedFSMAssemblerLevel4(unittest.TestCase):
         s = "FSM function_name2() { something;    something_else; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm__opt2(self):
         s = "FSM function_name3() { str something.this = \";\" ; regular.statement = \"regular\\\" escaped \\\"\"; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_opt3(self):
         s = "FSM function_name6() { FOR(GLOBAL int i = 0; i < 1000; i++ ) FOR(GLOBAL int i = 0; i < 1000; i++ ) { printf(\"Hello, world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         
     def test_to_fsm_opt4(self):
         s =  "FSM function_name10a() { IF(a==1) { print (\"hello, world!\"); } ELSE IF (a==2) { print(\"hello, alt world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         
     def test_to_fsm_opt5(self):
@@ -466,13 +466,13 @@ class TestOptimizedFSMAssemblerLevel4(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 14)
         self.assertEqual(len(fsm.global_variables), 3)
         
@@ -480,36 +480,36 @@ class TestOptimizedFSMAssemblerLevel4(unittest.TestCase):
         s = "FSM function_name2() { WHILE(true) {something;    something_else; }}"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         
     def test_to_fsm_opt7(self):
         s = "FSM function_name2() { DO {something;    something_else; }WHILE(true);}"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_opt8(self):
         s = "FSM function_name2() { WHILE(a == 0) { print(\"Doing Things\"); } IF (a==1) {print(\"doing something\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         
     def test_to_fsm_opt9(self):        
@@ -550,13 +550,13 @@ class TestOptimizedFSMAssemblerLevel4(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 17)
         
     def test_to_fsm_opt10(self):        
@@ -574,13 +574,13 @@ class TestOptimizedFSMAssemblerLevel4(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         
     def test_to_fsm_opt11(self):        
@@ -599,13 +599,13 @@ class TestOptimizedFSMAssemblerLevel4(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         
         
@@ -623,56 +623,56 @@ class TestOptimizedFSMAssemblerLevel5(unittest.TestCase):
         s = "FSM function_name2() { something;    something_else; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm__opt2(self):
         s = "FSM function_name3() { str something.this = \";\" ; regular.statement = \"regular\\\" escaped \\\"\"; }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_opt3(self):
         s = "FSM function_name6() { FOR(GLOBAL int i = 0; i < 1000; i++ ) FOR(GLOBAL int i = 0; i < 1000; i++ ) { printf(\"Hello, world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         
     def test_to_fsm_opt4(self):
         s =  "FSM function_name10a() { IF(a==1) { print (\"hello, world!\"); } ELSE IF (a==2) { print(\"hello, alt world!\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         
     def test_to_fsm_opt5(self):
@@ -700,14 +700,14 @@ class TestOptimizedFSMAssemblerLevel5(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 14)
         self.assertEqual(len(fsm.global_variables), 3)
         
@@ -715,42 +715,42 @@ class TestOptimizedFSMAssemblerLevel5(unittest.TestCase):
         s = "FSM function_name2() { WHILE(true) {something;    something_else; }}"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         
     def test_to_fsm_opt7(self):
         s = "FSM function_name2() { DO {something;    something_else; }WHILE(true);}"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         
     def test_to_fsm_opt8(self):
         s = "FSM function_name2() { WHILE(a == 0) { print(\"Doing Things\"); } IF (a==1) {print(\"doing something\"); } }"
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         
     def test_to_fsm_opt9(self):        
@@ -791,14 +791,14 @@ class TestOptimizedFSMAssemblerLevel5(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 17)
         
     def test_to_fsm_opt10(self):        
@@ -816,14 +816,14 @@ class TestOptimizedFSMAssemblerLevel5(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         
     def test_to_fsm_opt11(self):        
@@ -842,14 +842,14 @@ class TestOptimizedFSMAssemblerLevel5(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         
     def test_to_fsm_opt12(self):        
@@ -872,14 +872,14 @@ class TestOptimizedFSMAssemblerLevel5(unittest.TestCase):
         """
         res = parser.parse_to_AST(s)
         fsm = res.to_fsm()
-        assembler.optimize_fsm_consecutive_states(fsm.starting_node)
-        assembler.optimize_fsm_chained_empty_state(fsm.starting_node)
-        assembler.optimize_fsm_chained_branching(fsm.starting_node)
-        assembler.optimize_fsm_chained_merging(fsm.starting_node)
-        assembler.optimize_fsm_consecutive_uncollapsible_states(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_states(fsm.starting_node)
+        assembler.optimize_FSM_chained_empty_state(fsm.starting_node)
+        assembler.optimize_FSM_chained_branching(fsm.starting_node)
+        assembler.optimize_FSM_chained_merging(fsm.starting_node)
+        assembler.optimize_FSM_consecutive_uncollapsible_states(fsm.starting_node)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
         
         
@@ -926,7 +926,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         s = "FSM function_name2() { something;    something_else; }"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -935,7 +935,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         s = "FSM function_name3() { str something.this = \";\" ; regular.statement = \"regular\\\" escaped \\\"\"; }"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -944,7 +944,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         s = "FSM function_name6() { FOR(GLOBAL int i = 0; i < 1000; i++ ) FOR(GLOBAL int i = 0; i < 1000; i++ ) { printf(\"Hello, world!\"); } }"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 2)
@@ -953,7 +953,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         s =  "FSM function_name10a() { IF(a==1) { print (\"hello, world!\"); } ELSE IF (a==2) { print(\"hello, alt world!\"); } }"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -984,7 +984,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 14)
         self.assertEqual(len(fsm.global_variables), 3)        
         self.assertEqual(len(fsm.global_code_block), 1)
@@ -994,7 +994,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         s = "FSM function_name2() { WHILE(true) {something;    something_else; }}"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1003,7 +1003,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         s = "FSM function_name2() { DO {something;    something_else; }WHILE(true);}"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1012,7 +1012,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         s = "FSM function_name2() { WHILE(a == 0) { print(\"Doing Things\"); } IF (a==1) {print(\"doing something\"); } }"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1056,7 +1056,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 17)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1077,7 +1077,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1099,7 +1099,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         self.assertEqual(len(fsm.global_code_block), 1)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1120,7 +1120,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1143,7 +1143,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
     
     def test_to_fsm_opt14(self):        
@@ -1167,7 +1167,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
         
     def test_to_fsm_opt15(self):        
@@ -1186,7 +1186,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 4)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         
     def test_to_fsm_opt15(self):        
@@ -1210,7 +1210,7 @@ class TestAssemblerFunctionality(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s))
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         
     def test_to_fsm_opt_for_continue_stmt(self):        
@@ -1234,7 +1234,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         s = "FSM function_name2() { something;    something_else; }"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1243,7 +1243,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         s = "FSM function_name3() { str something.this = \";\" ; regular.statement = \"regular\\\" escaped \\\"\"; }"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1252,7 +1252,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         s = "FSM function_name6() { FOR(GLOBAL int i = 0; i < 1000; i++ ) FOR(GLOBAL int i = 0; i < 1000; i++ ) { printf(\"Hello, world!\"); } }"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 2)
@@ -1261,7 +1261,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         s =  "FSM function_name10a() { IF(a==1) { print (\"hello, world!\"); } ELSE IF (a==2) { print(\"hello, alt world!\"); } }"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1292,7 +1292,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 14)
         self.assertEqual(len(fsm.global_variables), 3)        
         self.assertEqual(len(fsm.global_code_block), 1)
@@ -1302,7 +1302,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         s = "FSM function_name2() { WHILE(true) {something;    something_else; }}"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1311,7 +1311,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         s = "FSM function_name2() { DO {something;    something_else; }WHILE(true);}"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 2)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1320,7 +1320,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         s = "FSM function_name2() { WHILE(a == 0) { print(\"Doing Things\"); } IF (a==1) {print(\"doing something\"); } }"
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1364,7 +1364,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 17)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1385,7 +1385,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 5)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1407,7 +1407,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 7)
         self.assertEqual(len(fsm.global_code_block), 1)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1428,7 +1428,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
         self.assertEqual(len(fsm.global_code_block), 0)
         self.assertEqual(len(fsm.global_variables), 0)
@@ -1451,7 +1451,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
     
     def test_to_fsm_opt14(self):        
@@ -1475,7 +1475,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
         
     def test_to_fsm_opt15a(self):        
@@ -1494,7 +1494,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 3)
         
     def test_to_fsm_opt15(self):        
@@ -1536,7 +1536,7 @@ class TestAssemblerFunctionality_LV5OPT(unittest.TestCase):
         fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
         # print(code_gen.fsm_to_mermaid(fsm.starting_node))
         # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
-        set_return = assembler.traverse_fsm(fsm.starting_node)
+        set_return = assembler.traverse_FSM(fsm.starting_node)
         self.assertEqual(len(set_return), 6)
         
         
