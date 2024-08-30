@@ -23,7 +23,7 @@ def purge_code_as_mermaid_commend(code:str) -> str:
     """
     return code.replace('"', "''").replace("\\", "\\\\")
 
-def fsm_to_mermaid(fsm_starting_node:FSMNode, debug:bool=False) -> str:
+def fsm_to_mermaid(fsm_starting_node:FSMNode, debug:bool=False, global_variables:list[FSMGlobalVar]|None=None) -> str:
     """return a string that illustrate the fsm in mermaid 
 
     Parameters
@@ -110,7 +110,13 @@ def fsm_to_mermaid(fsm_starting_node:FSMNode, debug:bool=False) -> str:
                         purge_code_as_mermaid_commend("\n".join(transition.code_block)), 
                         id(transition.target_node)
                     ) 
-    
+                    
+    if global_variables is not None:
+        ret_val +='\n    global_vars["`Global Variables\n'
+        for global_variable in global_variables:
+            ret_val += "        {} {};\n".format(global_variable.var_type, global_variable.var_name)
+        ret_val += '    `"]\n'
+        
     ret_val += "```"
     return ret_val
 
@@ -127,7 +133,7 @@ def purge_code_as_graphviz_dot_commend(code:str) -> str:
     """
     return code.replace('"', "''").replace("\\", "\\\\")
 
-def fsm_to_graphviz_dot(fsm_starting_node:FSMNode, debug:bool=False) -> str:
+def fsm_to_graphviz_dot(fsm_starting_node:FSMNode, debug:bool=False, global_variables:list[FSMGlobalVar]|None=None) -> str:
     """return a string that illustrate the fsm in graphviz, using DOT language 
 
     Parameters
@@ -212,6 +218,12 @@ def fsm_to_graphviz_dot(fsm_starting_node:FSMNode, debug:bool=False) -> str:
                         purge_code_as_graphviz_dot_commend(transition.condition), 
                         "\\n".join([purge_code_as_graphviz_dot_commend(line) for line in transition.code_block]), 
                     ) 
+    
+    if global_variables is not None:
+        ret_val +='\n    global_vars [shape=rect, label="Global Variables\\n'
+        for global_variable in global_variables:
+            ret_val += "{} {};\\n".format(global_variable.var_type, global_variable.var_name)
+        ret_val += '"]\n'
     
     ret_val += "}"
     return ret_val
@@ -328,5 +340,15 @@ def generate_code_from_FSM(
     )
     
     return cpp_function.render()
-    
 
+# -------------------------------------------------- #
+#                      Graphviz                      #
+# -------------------------------------------------- #
+def generate_graphviz_dot_visualization_from_FSM(fsm:FSMMachine) -> str:
+    return fsm_to_graphviz_dot(fsm.starting_node, global_variables=fsm.global_variables)
+
+# -------------------------------------------------- #
+#                       Mermaid                      #
+# -------------------------------------------------- #
+def generate_mermaid_visualization_from_FSM(fsm:FSMMachine) -> str:
+    return fsm_to_mermaid(fsm.starting_node, global_variables=fsm.global_variables)
