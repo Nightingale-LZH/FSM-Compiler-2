@@ -74,11 +74,11 @@ flowchart LR
         c_code_gen[C/C+ Code Generator]
     end
 
-    subgraph code_gen2[generate_code_from_FSM]
+    subgraph code_gen2[generate_graphviz_dot...]
         graphviz_gen[Graphviz Code Generator]
     end
 
-    subgraph code_gen3[generate_code_from_FSM]
+    subgraph code_gen3[generate_mermaid...]
         mermaid_gen[Mermaid Code Generator]
     end
 
