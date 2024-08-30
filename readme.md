@@ -487,8 +487,12 @@ flowchart LR
 ## Roadmap
 
 - [ ] Function call to other FSM
+  - [ ] Also, inline calling mode, add option to add other FSM into the current FSM.
 - [ ] C++ templating, i.e. generics
 - [x] ~~Structural controls like `break`, `continue`, `return`~~
 - [ ] Error state, analogs to ending state
 - [x] ~~L6(?) Optimization, convert Moore state to Mealy transition.~~
 - [ ] Add more comment in the codes
+- [ ] Add FSM_TEMPLATE function. Define the template and initialize multiple version of it.
+- [ ] Add Command line tool
+- [ ] Add GUI using Tkinter(?)
