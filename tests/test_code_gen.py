@@ -156,7 +156,7 @@ class TestCodeGenGraphvizDot(unittest.TestCase):
         """
         fsm = assembler.generate_FSM_from_AST(parser.generate_AST_from_code(s))
         # print(code_gen.generate_code_from_FSM(fsm))
-        print(code_gen.generate_graphviz_dot_visualization_from_FSM(fsm))
+        # print(code_gen.generate_graphviz_dot_visualization_from_FSM(fsm))
         self.assertEqual(len(code_gen.generate_graphviz_dot_visualization_from_FSM(fsm)), 1003)
 
 if __name__ == "__main__":

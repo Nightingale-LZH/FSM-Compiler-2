@@ -340,9 +340,15 @@ def generate_code_from_FSM(
     )
     
     return cpp_function.render()
-    
-def generate_mermaid_visualization_from_FSM(fsm:FSMMachine) -> str:
-    return fsm_to_mermaid(fsm.starting_node, global_variables=fsm.global_variables)
 
+# -------------------------------------------------- #
+#                      Graphviz                      #
+# -------------------------------------------------- #
 def generate_graphviz_dot_visualization_from_FSM(fsm:FSMMachine) -> str:
     return fsm_to_graphviz_dot(fsm.starting_node, global_variables=fsm.global_variables)
+
+# -------------------------------------------------- #
+#                       Mermaid                      #
+# -------------------------------------------------- #
+def generate_mermaid_visualization_from_FSM(fsm:FSMMachine) -> str:
+    return fsm_to_mermaid(fsm.starting_node, global_variables=fsm.global_variables)
