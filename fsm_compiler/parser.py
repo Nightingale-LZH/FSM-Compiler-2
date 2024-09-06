@@ -201,13 +201,13 @@ def parse_statement_block(input_str:str, partial_ast:lark.Tree) -> StatementLine
     return StatementBlock(partial_ast, ret_val)
 
 def parse_statement_declaration(input_str:str, partial_ast:lark.Tree) -> StatementDeclaration|None:
-    if partial_ast.data == "declaration":
-        return StatementLine(
-            partial_ast,
-            input_str[partial_ast.meta.start_pos : partial_ast.meta.end_pos]
-        )
+    # if partial_ast.data == "declaration":
+    #     return StatementLine(
+    #         partial_ast,
+    #         input_str[partial_ast.meta.start_pos : partial_ast.meta.end_pos]
+    #     )
         
-    elif partial_ast.data == "declaration_global":
+    if partial_ast.data == "declaration_global":
         datatype, variable = partial_ast.children
         return StatementDeclaration(
             partial_ast,
@@ -216,11 +216,11 @@ def parse_statement_declaration(input_str:str, partial_ast:lark.Tree) -> Stateme
             True
         )
     
-    elif partial_ast.data == "declaration_initialization":
-        return StatementLine(
-            partial_ast,
-            input_str[partial_ast.meta.start_pos : partial_ast.meta.end_pos]
-        )
+    # elif partial_ast.data == "declaration_initialization":
+    #     return StatementLine(
+    #         partial_ast,
+    #         input_str[partial_ast.meta.start_pos : partial_ast.meta.end_pos]
+    #     )
         
     elif partial_ast.data == "declaration_initialization_global":
         datatype, variable, expression = partial_ast.children
@@ -232,9 +232,15 @@ def parse_statement_declaration(input_str:str, partial_ast:lark.Tree) -> Stateme
             True
         )
         
-    elif partial_ast.data == "declaration_class_init":
+    elif partial_ast.data == "declaration_ordinary":
         return StatementLine(
             partial_ast,
             input_str[partial_ast.meta.start_pos : partial_ast.meta.end_pos]
         )
+        
+    # elif partial_ast.data == "declaration_class_init":
+    #     return StatementLine(
+    #         partial_ast,
+    #         input_str[partial_ast.meta.start_pos : partial_ast.meta.end_pos]
+    #     )
         

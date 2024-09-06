@@ -14,6 +14,10 @@
 
 #define GLOBAL 
 
+#define SKIP
+
+#define END_SKIP
+
 #define YIELD 
 void WAIT(int milliseconds) { sleep(milliseconds); }
 void WAIT_UNLESS(bool condition) {  }
@@ -49,3 +53,4 @@ void WAIT_UNLESS(bool condition) {  }
 #define ___MIN_RUNTIME_IS_TIME_PASSED(fsm_name, time_ms) (millis() > __fsm_min_runtime_iter_time_ ## fsm_name + (time_ms))
 
 #endif  //  ___FSM_KEYWORD_ARDUINO_HPP___
+

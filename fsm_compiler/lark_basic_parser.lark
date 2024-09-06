@@ -6,6 +6,8 @@ statement   : "FOR" "(" partialstmt ";" expression ";" partialstmt ")" statement
             | "IF" "(" expression ")" statement "ELSE" statement        -> statement_if_else
             | "IF" "(" expression ")" statement                         -> statement_if
 
+            | "SKIP" "(" expression ")" // add function to accept anything
+
             | "if" "(" expression ")" statement "else" statement                    -> statement_ordinary
             | "if" "(" expression ")" statement                                     -> statement_ordinary
             | "for" "(" partialstmt ";" expression ";" partialstmt ")" statement    -> statement_ordinary
@@ -35,17 +37,28 @@ partialstmt : declaration                               -> partialstmt_declarati
             | assignment                                -> partialstmt
             | expression                                -> partialstmt
 
-declaration : "GLOBAL" expression name "=" expression   -> declaration_initialization_global
-            | "GLOBAL" expression name                  -> declaration_global
-            | expression name "=" expression            -> declaration_initialization
-            | expression name "(" expr_block ")"        -> declaration_class_init
-            | expression name "{" expr_block "}"        -> declaration_class_init
-            | expression name                           -> declaration
+declaration : "GLOBAL" declarant  -> declaration_global
+            | "GLOBAL" declarant "=" expression -> declaration_initialization_global
+            | (declarant ["=" expression])* -> declaration_ordinary
 
-assignment  : name ASSIGN expression                    -> assignment
 
-expression  : name? "(" expr_block")" -> expression_bracket
-            | name? "[" expr_block "]"                  -> expression_bracket
+
+declarant   : datatype expression  -> declarant
+
+datatype    : expression datatype  -> datatype
+            | WORD                  -> datatype // TODO: FIx this
+
+// declaration : "GLOBAL" expression name "=" expression   -> declaration_initialization_global
+//             | "GLOBAL" expression name                  -> declaration_global
+//             | expression name "=" expression            -> declaration_initialization
+//             | expression name "(" expr_block ")"        -> declaration_class_init
+//             | expression name "{" expr_block "}"        -> declaration_class_init
+//             | expression name                           -> declaration
+
+assignment  : expression ASSIGN expression                    -> assignment
+
+expression  : identifier? "(" expr_block")"                   -> expression_bracket
+            | identifier? "[" expr_block "]"                  -> expression_bracket
             | "{" expr_block "}"                        -> expression_bracket
             | expression BIN_OPTR expression            -> expression
             | PRE_U_OPTR expression                     -> expression
@@ -56,18 +69,16 @@ expr_block  : [expression ("," expression)*]            -> expr_block
 
 literal     : string    -> literal_string
             | char      -> literal_char
-            | name      -> literal_name
+            | number    -> literal_number
             | boolean   -> literal_boolean
+            | identifier      -> literal_identifier
 
-name        : name "." WORD     -> name
-            | name "::" WORD    -> name
-            | name WORD         -> name
-            | WORD              -> name
+identifier  : WORD      -> identifier
 
-string      : "\"" STRCHAR* "\""    -> string
-char        : "'" STRCHAR "'"       -> char
-boolean     : "true" | "false"      -> boolean
-
+string      : "\"" STRCHAR* "\""        -> string
+char        : "'" STRCHAR "'"           -> char
+boolean     : "true" | "false"          -> boolean
+number      : FLOAT | DEC | OCT | HEX   -> number
 
 ASSIGN      : "+=" | "-=" | "*=" | "/=" | "%=" 
             | ">>=" | "<<=" | "&=" | "^=" | "|=" 
@@ -78,12 +89,18 @@ BIN_OPTR    : "+" | "-" | "*" | "/" | "%"
             | "&&" | "||" 
             | "?" | ":" 
             | "&" | "|" | "^" |  "<<" | ">>"
+            | "." | "::" | "->"
 
-PRE_U_OPTR  : "!" | "~" | "-" | "++" | "--" 
-
+PRE_U_OPTR  : "!" | "~" | "-" | "++" | "--" | "*" | "&" 
+ 
 POST_U_OPTR : "++" | "--" 
 
 STRCHAR     : /([^"\\]|(\\.))/
+
+FLOAT       : /([1-9][0-9]*|0?)(\.[0-9]*)?([eE][+-]?[1-9][0-9]*)?[fFlL]*/
+DEC         : /(0|[1-9][0-9]*[uUlL]*)/
+OCT         : /0[0-7]*/
+HEX         : /0x[0-9a-fA-F]*/
 
 // exclude the keywords, make the grammar more stable
 WORD        : /(?!\b(FSM|FOR|WHILE|DO|IF|ELSE|if|else|for|while|do|switch|case|default|YIELD|WAIT|WAIT_UNLESS|GLOBAL|true|false)\b)[a-zA-Z0-9_]+/

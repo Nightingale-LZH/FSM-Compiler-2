@@ -329,6 +329,24 @@ class TestParserPrettyPrint(unittest.TestCase):
         
         # print(res.print_pretty())
 
+class TestVariableReferencing(unittest.TestCase):
+    def test_variable_test(self):
+        s = """
+        FSM function_name_print_0() { 
+            std::vector<int> a(0, 0); 
+            std::string str;
+            GLOBAL float f; 
+            int i = 5+5; 
+            int j; 
+            GLOBAL std::string s = \"123\"; 
+            unsigned int x=0; 
+            this.hello(world);
+        }
+        """
+        res = parser.parse_to_AST(s)
+        print(res.lark_ast.pretty())
+        # print(res.print_pretty())
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.CRITICAL)
     # logging.basicConfig(level=logging.WARNING)
