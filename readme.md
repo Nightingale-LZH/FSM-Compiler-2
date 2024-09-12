@@ -68,21 +68,36 @@ flowchart LR
         optimizer[Optimizer]
     end
 
-    subgraph code_gen[generate_code_from_FSM]
+    subgraph code_gen1[generate_code_from_FSM]
         c_code_gen[C/C+ Code Generator]
     end
 
+    subgraph code_gen2[generate_graphviz_dot...]
+        graphviz_gen[Graphviz Code Generator]
+    end
+
+    subgraph code_gen3[generate_mermaid...]
+        mermaid_gen[Mermaid Code Generator]
+    end
+
     fsm_code[FSM C/C++ Code]
+    graphviz_code[Graphviz Visualization]
+    mermaid_code[Mermaid Visualization]
 
     original_code --> lark_parser
     lark_parser --> |Lark AST| fsm_parser
     fsm_parser -->|AST| translator
     translator -->|Raw FSM| optimizer
     optimizer -->|FSM| c_code_gen
-    c_code_gen --> fsm_code
+    optimizer -->|FSM| graphviz_gen
+    optimizer -->|FSM| mermaid_gen
+    c_code_gen --> fsm_code 
+    graphviz_gen --> graphviz_code 
+    mermaid_gen --> mermaid_code 
 ```
 
-### `generate_AST_from_code(input_str:str) -> ParseResult|None`
+***
+`generate_AST_from_code(input_str:str) -> ParseResult|None`
 
 - Parse the given code to AST.
 - `input_str` is the C/C++ code, and it must start at the FSM function.
@@ -90,13 +105,15 @@ flowchart LR
 - `ParseResult` is the processed AST; `ParseResult.lark_ast` is the raw AST immediately returned from the lark parser.
 - `parse_to_AST(input_str:str) -> ParseResult|None` is the alias of `generate_AST_from_code`.
 
-### `generate_FSM_from_AST(parse_result: ParseResult, optimization_level:int=5) -> FSMMachine`
+***
+`generate_FSM_from_AST(parse_result: ParseResult, optimization_level:int=5) -> FSMMachine`
 
 - Convert AST to FSM
 - Optimize FSM, See more in [FSM Optimizations](#fsm-optimizations) Section
-- The result `FSMMachine` is the FSM contain all information about states, transitions, and global variables. 
+- The resulting `FSMMachine` is the FSM contain all information about states, transitions, and global variables. 
 
-### `generate_code_from_FSM(fsm:FSMMachine, ...) -> str:`
+***
+`generate_code_from_FSM(fsm:FSMMachine, ...) -> str`
 
 - Convert FSM to C/C++ code.
   - `void <FUNCTION_NAME>()` will be generated. 
@@ -108,6 +125,18 @@ flowchart LR
   - When `generate_minimum_timed_function` is `True`, by default `True`.
     - `void <FUNCTION_NAME>_min_runtime(unsigned long ms)` will be generated.
     - `ms` specifies the minimum milliseconds that FSM will run.
+
+***
+`generate_graphviz_dot_visualization_from_FSM(fsm:FSMMachine) -> str`
+
+- Convert FSM to the Graphviz Dot code, using digraph module.
+- The resulting code requires the Graphviz visualizer to generate graph.
+
+***
+`generate_mermaid_visualization_from_FSM(fsm:FSMMachine) -> str`
+
+- Convert FSM to the Mermaid code, using flowchart module.
+- The resulting code requires the Mermaid visualizer to generate graph.
 
 ## Module Structure
 
@@ -191,7 +220,7 @@ flowchart LR
 
 ### L2, Optimize Chained Empty State
 
-**This optimization will by pass empty states.**
+**This optimization will bypass empty states.**
 
 When an empty state is sandwiched between two Uncollapsible states, the FSM can bypass the empty state. L1 Optimization cannot resolve this redundancy because it doesn't have check the code block inside the state.
 
@@ -456,9 +485,13 @@ flowchart LR
 ## Roadmap
 
 - [ ] Function call to other FSM
+  - [ ] Also, inline calling mode, add option to add other FSM into the current FSM.
 - [ ] C++ templating, i.e. generics
 - [x] ~~Structural controls like `break`, `continue`, `return`~~
 - [ ] Error state, analogs to ending state
 - [x] ~~L6(?) Optimization, convert Moore state to Mealy transition.~~
 - [ ] Add more comment in the codes
 - [x] ~~Structural Control in for-loop's initialization and update portion~~
+- [ ] Add FSM_TEMPLATE function. Define the template and initialize multiple version of it.
+- [ ] Add Command line tool
+- [ ] Add GUI using Tkinter(?)
