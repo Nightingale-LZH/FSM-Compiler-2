@@ -1782,6 +1782,116 @@ class TestAssemblerFunctionality_MealyOpt(unittest.TestCase):
         self.assertEqual(len(fsm.global_variables), 0)
         
         
+class TestAssembler_FORLoopStructualControl(unittest.TestCase):
+    """Structural Control statement in the init and update part of the for loop."""
+    
+    def test_for_loop_1(self):
+        s = """
+        FSM function_name_opt9() { 
+            FOR (GLOBAL int i = 1; i < 5; RETURN) {
+                print("hello world");
+            }
+        }
+        
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_FSM(fsm.starting_node)
+        self.assertEqual(len(set_return), 3)
+    
+    def test_for_loop_2(self):
+        s = """
+        FSM function_name_opt9() { 
+            FOR (RETURN; i < 5; i++) {
+                print("hello world");
+            }
+        }
+        
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_FSM(fsm.starting_node)
+        self.assertEqual(len(set_return), 2)
+        
+    def test_for_loop_3(self):
+        s = """
+        FSM function_name_opt9() { 
+            FOR (GLOBAL int i = 1; i < 5; CONTINUE) {
+                print("hello world");
+            }
+        }
+        
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_FSM(fsm.starting_node)
+        self.assertEqual(len(set_return), 4)
+        
+    def test_for_loop_3x(self):
+        s = """
+        FSM function_name_opt9() { 
+            FOR (GLOBAL int i = 1; i < 5; i++) {
+                IF(i < 3) {
+                    CONTINUE;
+                } ELSE {
+                    print("hello world");
+                }
+            }
+        }
+        
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_FSM(fsm.starting_node)
+        self.assertEqual(len(set_return), 6)
+        
+    def test_for_loop_4(self):
+        s = """
+        FSM function_name_opt9() { 
+            FOR (GLOBAL int i = 1; i < 5; CONTINUE) {
+                print("hello world 1");
+                FOR (GLOBAL int j = 1; j < 5; BREAK) {
+                    print("hello world 2");
+                    FOR (GLOBAL int k = 1; k < 5; RETURN) {
+                        print("hello world 3");
+                    }
+                }
+            }
+        }
+        
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        # print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_FSM(fsm.starting_node)
+        self.assertEqual(len(set_return), 7)
+    
+    def test_for_loop_5(self):
+        s = """
+        FSM function_name_opt9() { 
+            FOR (GLOBAL int i = 1; i < 5; CONTINUE) {
+                print("hello world 1");
+                FOR (GLOBAL int j = 1; j < 5; BREAK) {
+                    print("hello world 2");
+                    FOR (GLOBAL int k = 1; k < 5; BREAK) {
+                        print("hello world 3");
+                    }
+                }
+            }
+        }
+        
+        """
+        fsm = assembler.generate_FSM_from_AST(parser.parse_to_AST(s), 5)
+        # print(code_gen.fsm_to_mermaid(fsm.starting_node))
+        print(code_gen.fsm_to_graphviz_dot(fsm.starting_node))
+        set_return = assembler.traverse_FSM(fsm.starting_node)
+        self.assertEqual(len(set_return), 7)
+
+    
 if __name__ == "__main__":
     logging.basicConfig(level=logging.CRITICAL)
     # logging.basicConfig(level=logging.WARNING)
