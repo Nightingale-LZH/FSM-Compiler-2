@@ -250,9 +250,11 @@ class StatementFor(Statement):
         # process on all statements
         fsm_return_initialization = self.initialization.to_fsm(fsm_name)
         ret_global_vars += fsm_return_initialization.global_variables
+        ret_return_nodes += fsm_return_initialization.return_nodes
                 
         fsm_return_update = self.update.to_fsm(fsm_name)
         ret_global_vars += fsm_return_update.global_variables
+        ret_return_nodes += fsm_return_update.return_nodes
         
         fsm_return_statement = self.statements.to_fsm(fsm_name)
         ret_global_vars  += fsm_return_statement.global_variables
@@ -275,14 +277,32 @@ class StatementFor(Statement):
             for continue_node in fsm_return_statement.continue_nodes:
                 continue_node.transitions.clear()
                 continue_node.transitions.append(FSMTransition([], "", fsm_return_update.starting_node))
+                
+            # !!! CONTINUE in initialization part of the for loop sematically means nothing. 
+            #       So, ignore the continue node for the forloop initialization 
+                
+            # !!! CONTINUE in update part of the for loop sematically means nothing. 
+            #       So, ignore the continue node for the forloop update 
               
             # multiple node will point to end node, then the end node will be uncollapsible  
             fsm_return_update.starting_node.collapsible = False
         
         # break statement
-        if len(fsm_return_statement.break_nodes) > 0:
+        if (
+            len(fsm_return_statement.break_nodes) > 0
+            or len(fsm_return_initialization.break_nodes) > 0
+            or len(fsm_return_update.break_nodes) > 0
+        ):
             # clear all extra transitions and point all the node to break node
             for break_node in fsm_return_statement.break_nodes:
+                break_node.transitions.clear()
+                break_node.transitions.append(FSMTransition([], "", node_end))
+                
+            for break_node in fsm_return_initialization.break_nodes:
+                break_node.transitions.clear()
+                break_node.transitions.append(FSMTransition([], "", node_end))
+                
+            for break_node in fsm_return_update.break_nodes:
                 break_node.transitions.clear()
                 break_node.transitions.append(FSMTransition([], "", node_end))
                 
