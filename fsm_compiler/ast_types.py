@@ -272,7 +272,11 @@ class StatementFor(Statement):
         
         # Capture CONTINUE and BREAK statement
         # continue statement
-        if len(fsm_return_statement.continue_nodes) > 0:
+        if (
+            len(fsm_return_statement.continue_nodes) > 0
+            or len(fsm_return_initialization.continue_nodes) > 0
+            or len(fsm_return_update.continue_nodes) > 0
+        ):
             # clear all extra transitions and point all the node to continue node
             for continue_node in fsm_return_statement.continue_nodes:
                 continue_node.transitions.clear()
@@ -290,7 +294,11 @@ class StatementFor(Statement):
             fsm_return_update.starting_node.collapsible = False
         
         # break statement
-        if len(fsm_return_statement.break_nodes) > 0:
+        if (
+            len(fsm_return_statement.break_nodes) > 0
+            or len(fsm_return_initialization.break_nodes) > 0
+            or len(fsm_return_update.break_nodes) > 0
+        ):
             # clear all extra transitions and point all the node to break node
             for break_node in fsm_return_statement.break_nodes:
                 break_node.transitions.clear()
