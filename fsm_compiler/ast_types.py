@@ -272,23 +272,17 @@ class StatementFor(Statement):
         
         # Capture CONTINUE and BREAK statement
         # continue statement
-        if (
-            len(fsm_return_statement.continue_nodes) > 0
-            or len(fsm_return_initialization.continue_nodes) > 0
-            or len(fsm_return_update.continue_nodes) > 0
-        ):
+        if len(fsm_return_statement.continue_nodes) > 0:
             # clear all extra transitions and point all the node to continue node
             for continue_node in fsm_return_statement.continue_nodes:
                 continue_node.transitions.clear()
                 continue_node.transitions.append(FSMTransition([], "", fsm_return_update.starting_node))
                 
-            for continue_node in fsm_return_initialization.continue_nodes:
-                continue_node.transitions.clear()
-                continue_node.transitions.append(FSMTransition([], "", fsm_return_update.starting_node))
+            # !!! CONTINUE in initialization part of the for loop sematically means nothing. 
+            #       So, ignore the continue node for the forloop initialization 
                 
-            for continue_node in fsm_return_update.continue_nodes:
-                continue_node.transitions.clear()
-                continue_node.transitions.append(FSMTransition([], "", fsm_return_update.starting_node))
+            # !!! CONTINUE in update part of the for loop sematically means nothing. 
+            #       So, ignore the continue node for the forloop update 
               
             # multiple node will point to end node, then the end node will be uncollapsible  
             fsm_return_update.starting_node.collapsible = False
